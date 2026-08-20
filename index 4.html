@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Beacon">
+<meta name="theme-color" content="#12305C">
+<title>The Beacon</title>
+<style>
+  :root{--ink:#0B1F3F;--night:#12305C;--beam:#F2B01E;--sand:#FAF6EF;--slate:#4A5B72;
+        --rule:rgba(11,31,63,.14);--good:#1F7A55;--miss:#B23A2E;--warn:#8A5A00}
+  html{color-scheme:light only}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:#FAF6EF}
+  body{color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+
+  header{background:var(--night);color:#fff;border-radius:6px;padding:22px 20px;
+         padding-top:calc(22px + env(safe-area-inset-top))}
+  .eyebrow{font-size:10px;letter-spacing:.2em;font-weight:700;color:var(--beam);margin:0 0 6px}
+  h1{font-family:Georgia,serif;font-size:28px;margin:0 0 6px;font-weight:700}
+  header p{margin:0;font-size:13.5px;color:rgba(255,255,255,.82)}
+
+  #notices{margin:12px 0 0}
+  .notice{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:11px 12px;
+          margin-bottom:8px;font-size:12.5px;color:var(--slate)}
+  .notice.warn{border-color:#d7b56d;background:#fffaf0;color:#6d4a00}
+  .notice strong{color:var(--ink)}
+  .notice button{float:right;border:0;background:none;color:var(--night);font-weight:700;
+                 font-size:12px;padding:0 0 0 10px;cursor:pointer}
+
+  nav{display:flex;gap:6px;margin:18px 0}
+  nav button{flex:1;padding:10px 4px;font-size:13px;font-weight:600;border-radius:5px;
+             border:1px solid var(--rule);background:#fff;color:var(--slate);cursor:pointer}
+  nav button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .card{background:#fff;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .tag{padding:9px 16px;font-size:10.5px;letter-spacing:.14em;font-weight:700;color:#fff}
+  .Maths{background:#1E3A8A}.Science{background:#166534}
+  .English{background:#B45309}.Chinese{background:#9F1239}
+  .body{padding:22px 20px}
+  .q{font-size:17px;line-height:1.5;margin:0 0 18px}
+  .commit{font-size:13px;color:var(--slate);background:#f7f8fa;border-radius:5px;padding:10px 12px;margin:0 0 12px}
+  .a{border-left:4px solid var(--beam);padding-left:14px;margin-bottom:18px}
+  .a p{margin:0 0 8px}
+  .a .why{font-size:13.5px;color:var(--slate);font-style:italic;margin:0}
+
+  button.big{width:100%;padding:14px;border:none;border-radius:5px;font-size:15px;
+             font-weight:700;color:#fff;background:var(--night);cursor:pointer}
+  .row{display:flex;gap:8px}
+  .row button{flex:1;padding:14px;border:none;border-radius:5px;font-size:15px;
+              font-weight:700;color:#fff;cursor:pointer}
+  .miss{background:var(--miss)}.good{background:var(--good)}
+
+  label{display:block;font-size:10.5px;letter-spacing:.12em;font-weight:700;
+        color:var(--slate);margin:0 0 6px}
+  textarea,input{width:100%;border:1px solid #cbd5e1;border-radius:5px;padding:11px;
+                 font:inherit;font-size:15px;margin-bottom:16px;background:#fff;color:var(--ink)}
+  textarea{resize:vertical}
+  .subs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .subs button{flex:1;min-width:70px;padding:10px 6px;border:none;border-radius:5px;
+               font-size:13px;font-weight:600;background:#e8eaee;color:var(--slate);cursor:pointer}
+  .subs button.on{background:var(--ink);color:#fff}
+  .form-error{font-size:12.5px;color:var(--miss);margin:-6px 0 14px;font-weight:600}
+
+  .item{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:12px 14px;
+        margin-bottom:8px;display:flex;gap:11px;align-items:flex-start}
+  .pill{font-size:9.5px;font-weight:700;color:#fff;padding:4px 7px;border-radius:4px;flex:0 0 auto}
+  .item .txt{flex:1;min-width:0;font-size:13.5px}
+  .item .meta{font-size:11.5px;color:#94a3b8;margin-top:3px}
+  .item .actions{display:flex;gap:10px;margin-top:6px}
+  .item .actions button{border:0;background:none;padding:0;color:var(--night);font-size:11.5px;
+                        text-decoration:underline;cursor:pointer}
+  .item .actions button.delete{color:var(--miss)}
+
+  .empty{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:40px 24px;text-align:center}
+  .empty strong{display:block;font-size:18px;margin-bottom:6px}
+  .empty span{font-size:14px;color:var(--slate)}
+  .foot{margin-top:22px;text-align:center}
+  .foot button{background:none;border:none;color:#94a3b8;font-size:12px;
+               text-decoration:underline;cursor:pointer;padding:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">PROJECT LIGHTHOUSE 2.0</p>
+    <h1>The Beacon</h1>
+    <p>Five cards, five minutes, at the end of the day. The ones you miss come back sooner.</p>
+  </header>
+
+  <div id="notices"></div>
+
+  <nav>
+    <button id="t-today" class="on">Today</button>
+    <button id="t-add">Log a mistake</button>
+    <button id="t-all">All cards</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <div class="foot">
+    <button id="export">Back up my cards</button>
+    <button id="restore">Restore from backup</button>
+    <input type="file" id="file" accept="application/json,.json" style="display:none">
+    <div style="font-size:11px;color:#b6bfcb;margin-top:2px">The Beacon · Release 19d · 2026-08-20</div>
+  </div>
+</div>
+
+<script>
+const DAY=86400000, INTERVALS=[1,3,7,14,30];
+const today=()=>new Date().setHours(0,0,0,0);
+const SUBJECTS=["Maths","Science","English","Chinese"];
+const PLAN=["Science","Science","Maths","Language","Any"];
+const LANG=["English","Chinese"];
+const ERROR_FIRST_SLOTS=2;
+const FINAL_WINDOW_DAYS=7;
+const BACKUP_AFTER_DAYS=3;
+const EXAMS={
+  English:new Date(2026,8,24).setHours(0,0,0,0),
+  Maths:new Date(2026,8,25).setHours(0,0,0,0),
+  Chinese:new Date(2026,8,28).setHours(0,0,0,0),
+  Science:new Date(2026,8,29).setHours(0,0,0,0)
+};
+
+const SEED=[
+["Maths","A tank is 3/5 filled. After 12 L more it is 7/10 full. What is its capacity?","120 L. The 12 L is 7/10 − 3/5 = 1/10 of the tank.","Find what fraction the added amount represents before anything else."],
+["Maths","Boys : girls = 3 : 5. There are 24 more girls than boys. How many children altogether?","96. The difference is 2 units = 24, so 1 unit = 12, and 8 units = 96.","The difference in units is the bridge between the ratio and the real number."],
+["Maths","A car covers 180 km in 2 h 30 min. What is its average speed?","72 km/h. 180 ÷ 2.5.","Convert minutes into a decimal or fraction of an hour before dividing."],
+["Maths","Find the area of a quadrant of radius 14 cm. Take π as 22/7.","154 cm². A quarter of the full circle, which is 22/7 × 14 × 14 = 616.","Work out the whole circle first, then take the fraction."],
+["Maths","An $80 item rises 15%, then is discounted 10%. What is the final price?","$82.80. 80 × 1.15 = 92, then 92 × 0.9.","Percentages apply one after another. They are never added together."],
+["Maths","The angles of a triangle are in the ratio 2 : 3 : 4. Find the largest angle.","80°. 9 units = 180°, so 1 unit = 20°, and 4 units = 80°.","The total units always map onto 180° for a triangle."],
+["Science","Why does a plant kept in a dark cupboard eventually die, even if it is watered?","Without light it cannot photosynthesise, so it cannot make food, and its stored food runs out.","Name the process and the reason. 'No sunlight' on its own will not score."],
+["Science","A metal spoon feels colder than a wooden one in the same room. Explain why.","Metal is a better conductor of heat, so it conducts heat away from your hand faster.","Both are at the same temperature. The answer is about the rate of heat transfer."],
+["Science","In a fair test on how light affects plant growth, name one variable you must keep the same.","The amount of water. Also: soil type, pot size, type of plant, temperature.","Change one thing, measure one thing, keep everything else the same."],
+["Science","A seed has a papery wing. How is it dispersed, and how does that help the plant?","By wind. It lands further from the parent plant, so there is less competition for water, sunlight and nutrients.","Always add the benefit. The mark is usually in the 'why'."],
+["Science","Name the stages of a butterfly's life cycle.","Egg → larva (caterpillar) → pupa → adult. This is complete metamorphosis.","Butterfly and beetle have four stages. Grasshopper and cockroach have three."],
+["Science","Why do water droplets form on the outside of a cold glass?","Water vapour in the surrounding air loses heat to the cold glass and condenses into water droplets.","Say where the water came from. It did not leak through the glass."],
+["English","Combine using 'Despite': 'He was exhausted. He kept working.'","Despite being exhausted, he kept working.","'Despite' is followed by a noun or an -ing verb, never by a full clause."],
+["English","Choose: 'Neither of the boys (was / were) willing to admit it.'","was — 'neither' is singular.","Look past the words sitting between the subject and the verb."],
+["English","What does 'meticulous' mean? Use it in a sentence.","Extremely careful about detail. 'She kept meticulous notes of every experiment.'","Give the meaning and a natural sentence. One without the other rarely scores."],
+["English","Rewrite in reported speech: 'I will finish it tomorrow,' she said.","She said that she would finish it the following day.","Shift the tense back, and change the time word too."],
+["English","Choose: 'The news (is / are) encouraging.'","is — 'news' is uncountable.","Uncountable nouns take a singular verb even when they end in -s."],
+["Chinese","一丝不苟 是什么意思？","形容做事非常认真细致，一点也不马虎。","成语题先想清楚它形容的是态度还是结果。"],
+["Chinese","兴高采烈 用在什么情况？请造一个句子。","形容非常高兴。例：听到可以去露营，大家都兴高采烈。","成语要放进完整的句子里才算真正掌握。"],
+["Chinese","填量词：一（  ）书、一（  ）花、一（  ）马","一本书、一朵花、一匹马。","量词要一组一组地记，不要单个背。"],
+["Chinese","用「虽然……但是……」造一个句子。","例：虽然天气很热，但是他还是坚持跑步。","关联词要成对使用，前后句的意思要相反。"]
+];
+
+let cards, tab="today", shown=false, editingId=null, storageWarning="", formError="";
+let form={subject:"Maths",prompt:"",attempt:"",answer:"",note:""};
+
+function readLocal(key){
+  try{return localStorage.getItem(key);}catch(e){storageWarning="Beacon cannot read its saved data on this device.";return null;}
+}
+function writeLocal(key,value){
+  try{localStorage.setItem(key,value);return true;}
+  catch(e){storageWarning="Beacon could not save this change. Please tell Dad before closing the app.";return false;}
+}
+function readNum(key){const v=Number(readLocal(key));return Number.isFinite(v)?v:0;}
+function standalone(){return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;}
+function examFor(subject){return EXAMS[subject]||Infinity;}
+function inFinalWindow(subject){const e=examFor(subject),t=today();return Number.isFinite(e)&&t>=e-FINAL_WINDOW_DAYS*DAY&&t<e;}
+function examActive(subject){return today()<examFor(subject);}
+function needsFinalSweep(c){const e=examFor(c.subject);return inFinalWindow(c.subject)&&c.finalSweep!==e;}
+
+/* 19d migration: keep 19c storage keys so D1's existing deck survives the release. */
+function normalizeCard(c){
+  return {...c,
+    origin:c.origin || (String(c.id||"").startsWith("m-") ? "mistake" : "seed"),
+    attempt:c.attempt||"",
+    note:c.note||"",
+    lastReviewed:c.lastReviewed||0,
+    finalSweep:c.finalSweep||0
+  };
+}
+function normalizeDeck(list){return list.map(normalizeCard);}
+
+function save(markChange=true){
+  const ok=writeLocal("beacon-deck",JSON.stringify(cards));
+  if(ok&&markChange)writeLocal("beacon-last-change",String(Date.now()));
+  return ok;
+}
+function meta(){
+  try{const m=JSON.parse(readLocal("beacon-meta"));if(m&&m.date===today())return m;}catch(e){}
+  return {date:today(),done:0};
+}
+function setMeta(m){return writeLocal("beacon-meta",JSON.stringify(m));}
+
+function load(){
+  if(!readNum("beacon-created-at"))writeLocal("beacon-created-at",String(Date.now()));
+  try{
+    const raw=readLocal("beacon-deck");
+    if(raw){cards=normalizeDeck(JSON.parse(raw));save(false);return;}
+  }catch(e){storageWarning="Beacon found saved data it could not read. Please restore from a backup before continuing.";}
+  cards=SEED.map((s,i)=>({id:"seed-"+i,subject:s[0],prompt:s[1],attempt:"",answer:s[2],note:s[3],
+                          box:0,due:today(),seen:0,origin:"seed",lastReviewed:0,finalSweep:0}));
+  save(true);
+}
+
+const esc=s=>String(s).replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c]));
+
+/* A demonstrated weakness gets first refusal for the first two daily slots. */
+function priorityMiss(c){return (c.origin==="mistake"&&c.box===0)||(c.box===0&&c.seen>0);}
+function rank(a,b){
+  const ma=priorityMiss(a)?0:1,mb=priorityMiss(b)?0:1;
+  if(ma!==mb)return ma-mb;
+  return a.due-b.due;
+}
+function finalRank(a,b){const ea=examFor(a.subject),eb=examFor(b.subject);return ea!==eb?ea-eb:rank(a,b);}
+function pool(){
+  const t=today();
+  return cards.filter(c=>examActive(c.subject)&&c.lastReviewed!==t&&(c.due<=t||needsFinalSweep(c)));
+}
+function remaining(){return Math.max(0,Math.min(PLAN.length-meta().done,pool().length));}
+
+function nextCard(){
+  const m=meta();
+  if(m.done>=PLAN.length)return null;
+  const p=pool();
+  if(!p.length)return null;
+
+  const mine=p.filter(priorityMiss).sort(rank);
+  if(m.done<ERROR_FIRST_SLOTS&&mine.length)return mine[0];
+
+  /* During a subject's final week, sweep it once and prioritise the nearest paper. */
+  const finals=p.filter(needsFinalSweep).sort(finalRank);
+  if(finals.length)return finals[0];
+
+  const slot=PLAN[m.done];
+  const want=slot==="Language"?LANG:slot==="Any"?null:[slot];
+  let list=want?p.filter(c=>want.indexOf(c.subject)>-1):p.slice();
+  if(!list.length)list=p.slice();
+  return list.sort(rank)[0];
+}
+
+function backupDue(){
+  const change=readNum("beacon-last-change"),backup=readNum("beacon-last-backup");
+  if(!change||change<=backup)return false;
+  const baseline=backup||readNum("beacon-created-at")||change;
+  return Date.now()-baseline>=BACKUP_AFTER_DAYS*DAY;
+}
+
+function renderNotices(){
+  const n=document.getElementById("notices"),parts=[];
+  if(storageWarning)parts.push('<div class="notice warn"><strong>Save warning.</strong> '+esc(storageWarning)+'</div>');
+  if(!standalone()&&readLocal("beacon-setup-seen")!=="1"){
+    parts.push('<div class="notice"><button id="dismiss-setup">Got it</button><strong>One Beacon, one device.</strong> Use D1’s main study device as the source of truth. On iPhone/iPad: Share → Add to Home Screen.</div>');
+  }
+  if(backupDue())parts.push('<div class="notice warn"><button id="backup-now">Back up now</button><strong>Backup check.</strong> Your Beacon has changed since the last backup.</div>');
+  n.innerHTML=parts.join("");
+  const ds=document.getElementById("dismiss-setup");if(ds)ds.onclick=()=>{writeLocal("beacon-setup-seen","1");renderNotices();};
+  const bn=document.getElementById("backup-now");if(bn)bn.onclick=doExport;
+}
+
+function render(){
+  renderNotices();
+  const v=document.getElementById("view");
+  document.getElementById("t-today").textContent="Today ("+remaining()+")";
+  document.getElementById("t-all").textContent="All cards ("+cards.length+")";
+  ["today","add","all"].forEach(t=>document.getElementById("t-"+t).classList.toggle("on",tab===t));
+  if(tab==="today")return renderToday(v);
+  if(tab==="add")return renderAdd(v);
+  renderAll(v);
+}
+
+function renderToday(v){
+  const c=nextCard(),m=meta();
+  if(!c){
+    const finished=m.done>=PLAN.length;
+    v.innerHTML='<div class="empty"><strong>'+(finished?"All five done for today.":"Nothing due today.")+'</strong><span>'+
+      (finished?"Come back tomorrow, or log a mistake from today’s work.":"Log a mistake from today’s work and it will be here tomorrow.")+
+      '</span></div>';
+    return;
+  }
+  const coaching=c.subject==="Science"
+    ? "Say the full answer out loud first. Aim for cause → process → effect."
+    : "Say your full answer out loud before you reveal it.";
+  v.innerHTML='<div class="card"><div class="tag '+c.subject+'">'+c.subject.toUpperCase()+' · CARD '+(m.done+1)+' OF '+PLAN.length+'</div><div class="body">'+
+    '<p class="q">'+esc(c.prompt)+'</p>'+
+    (!shown
+      ? '<p class="commit">'+esc(coaching)+'</p><button class="big" id="reveal">I’ve answered · Show answer</button>'
+      : '<div class="a"><p>'+esc(c.answer)+'</p>'+(c.note?'<p class="why">'+esc(c.note)+'</p>':'')+'</div>'+
+        '<div class="row"><button class="miss" id="no">Missed it</button><button class="good" id="yes">Got it</button></div>')+
+    '</div></div>';
+  if(!shown)document.getElementById("reveal").onclick=()=>{shown=true;render();};
+  else{
+    document.getElementById("no").onclick=()=>grade(c,false);
+    document.getElementById("yes").onclick=()=>grade(c,true);
+  }
+}
+
+/* Exam-aware scheduling. The final seven days ignore boxes for one sweep; misses can return once more before the paper. */
+function grade(c,got){
+  const box=got?Math.min(c.box+1,INTERVALS.length-1):0;
+  c.box=box;c.seen++;c.lastReviewed=today();
+  const exam=examFor(c.subject);
+  if(inFinalWindow(c.subject)){
+    c.finalSweep=exam;
+    c.due=got?exam:Math.min(today()+DAY,exam-DAY);
+  }else{
+    let due=today()+INTERVALS[box]*DAY;
+    if(Number.isFinite(exam))due=Math.min(due,exam-FINAL_WINDOW_DAYS*DAY);
+    c.due=Math.max(today()+DAY,due);
+  }
+  const m=meta();m.done++;setMeta(m);save(true);shown=false;render();
+}
+
+function renderAdd(v){
+  const editing=editingId!==null;
+  v.innerHTML='<div class="card"><div class="body">'+
+    '<p style="font-size:13.5px;color:var(--slate);margin:0 0 18px">'+
+    (editing?'Fix the card, then save it. Editing resets its review schedule.':'After marking a paper, capture the mistake properly. It will first come back tomorrow.')+'</p>'+
+    '<label>SUBJECT</label><div class="subs">'+SUBJECTS.map(s=>'<button data-s="'+s+'"'+(form.subject===s?' class="on"':'')+'>'+s+'</button>').join("")+'</div>'+
+    '<label>WHAT WAS ASKED?</label><textarea id="f-q" rows="3" placeholder="Write the question the way it appeared">'+esc(form.prompt)+'</textarea>'+
+    '<label>WHAT DID I DO?</label><textarea id="f-w" rows="2" placeholder="My answer, method or wording">'+esc(form.attempt)+'</textarea>'+
+    '<label>WHAT WAS ACTUALLY REQUIRED?</label><textarea id="f-a" rows="3" placeholder="The correct answer or model reasoning">'+esc(form.answer)+'</textarea>'+
+    '<label>ONE-LINE RULE FOR NEXT TIME</label><input id="f-n" placeholder="e.g. Explain cause → process → effect" value="'+esc(form.note)+'">'+
+    (formError?'<div class="form-error">'+esc(formError)+'</div>':'')+
+    '<button class="big" id="save-card">'+(editing?'Save changes':'Add to The Beacon')+'</button>'+
+    (editing?'<button class="big" id="cancel-edit" style="margin-top:8px;background:#64748b">Cancel</button>':'')+
+    '</div></div>';
+
+  v.querySelectorAll(".subs button").forEach(b=>b.onclick=()=>{syncForm();form.subject=b.dataset.s;render();});
+  document.getElementById("save-card").onclick=()=>{
+    syncForm();
+    if(!form.prompt.trim()||!form.attempt.trim()||!form.answer.trim()||!form.note.trim()){
+      formError="Fill in all four parts. The mistake itself is what Beacon is learning from.";render();return;
+    }
+    if(editing){
+      const c=cards.find(x=>x.id===editingId);
+      if(c){Object.assign(c,{subject:form.subject,prompt:form.prompt,attempt:form.attempt,answer:form.answer,note:form.note,
+                             box:0,due:today()+DAY,seen:0,lastReviewed:0,finalSweep:0});}
+    }else{
+      cards.push({id:"m-"+Date.now(),subject:form.subject,prompt:form.prompt,attempt:form.attempt,
+                  answer:form.answer,note:form.note,box:0,due:today()+DAY,seen:0,origin:"mistake",lastReviewed:0,finalSweep:0});
+    }
+    save(true);form={subject:form.subject,prompt:"",attempt:"",answer:"",note:""};formError="";editingId=null;tab="today";shown=false;render();
+  };
+  const ce=document.getElementById("cancel-edit");if(ce)ce.onclick=()=>{editingId=null;formError="";form={subject:"Maths",prompt:"",attempt:"",answer:"",note:""};tab="all";render();};
+}
+
+function syncForm(){
+  const q=document.getElementById("f-q");
+  if(q){form.prompt=q.value;form.attempt=document.getElementById("f-w").value;form.answer=document.getElementById("f-a").value;form.note=document.getElementById("f-n").value;}
+}
+
+function cardStatus(c){
+  const exam=examFor(c.subject);
+  if(today()>=exam)return "Paper completed";
+  if(needsFinalSweep(c))return "Final review due";
+  return "Box "+(c.box+1)+" · next on "+new Date(c.due).toLocaleDateString();
+}
+function renderAll(v){
+  v.innerHTML=cards.map(c=>'<div class="item"><span class="pill '+c.subject+'">'+c.subject.slice(0,4).toUpperCase()+'</span><div class="txt">'+
+    esc(c.prompt.slice(0,90))+(c.prompt.length>90?'…':'')+'<div class="meta">'+esc(cardStatus(c))+(c.origin==="mistake"?' · MY MISTAKE':'')+'</div>'+
+    (c.origin==="mistake"?'<div class="actions"><button data-edit="'+c.id+'">Edit</button><button class="delete" data-delete="'+c.id+'">Delete</button></div>':'')+
+    '</div></div>').join("");
+  v.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{
+    const c=cards.find(x=>x.id===b.dataset.edit);if(!c)return;
+    editingId=c.id;form={subject:c.subject,prompt:c.prompt,attempt:c.attempt||"",answer:c.answer,note:c.note||""};formError="";tab="add";render();
+  });
+  v.querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>{
+    const c=cards.find(x=>x.id===b.dataset.delete);if(!c)return;
+    if(!confirm("Delete this mistake from The Beacon?"))return;
+    cards=cards.filter(x=>x.id!==c.id);save(true);render();
+  });
+}
+
+function doExport(){
+  const blob=new Blob([JSON.stringify(cards,null,2)],{type:"application/json"});
+  const a=document.createElement("a"),url=URL.createObjectURL(blob);
+  a.href=url;a.download="the-beacon-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  writeLocal("beacon-last-backup",String(Date.now()));renderNotices();
+}
+
+document.getElementById("t-today").onclick=()=>{tab="today";shown=false;editingId=null;formError="";render();};
+document.getElementById("t-add").onclick=()=>{tab="add";shown=false;editingId=null;formError="";form={subject:form.subject,prompt:"",attempt:"",answer:"",note:""};render();};
+document.getElementById("t-all").onclick=()=>{tab="all";shown=false;editingId=null;formError="";render();};
+document.getElementById("export").onclick=doExport;
+document.getElementById("restore").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!Array.isArray(data)||!data.length||!data.every(c=>c&&c.prompt&&c.subject&&c.answer))throw 0;
+      if(!confirm("Replace the current Beacon with "+data.length+" cards from this backup?"))return;
+      cards=normalizeDeck(data);save(true);writeLocal("beacon-last-backup",String(Date.now()));tab="today";shown=false;editingId=null;render();
+      alert("Restored "+data.length+" cards.");
+    }catch(err){alert("That file does not look like a Beacon backup.");}
+  };
+  r.readAsText(f);e.target.value="";
+};
+
+load();render();
+</script>
+</body>
+</html>
