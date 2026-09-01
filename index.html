@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light only">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Beacon">
+<meta name="theme-color" content="#12305C">
+<title>The Beacon</title>
+<style>
+  :root{--ink:#0B1F3F;--night:#12305C;--beam:#F2B01E;--sand:#FAF6EF;--slate:#4A5B72;
+        --rule:rgba(11,31,63,.14);--good:#1F7A55;--miss:#B23A2E;--warn:#8A5A00}
+  html{color-scheme:light only}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;background:#FAF6EF}
+  body{color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+       padding-bottom:env(safe-area-inset-bottom)}
+  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+
+  header{background:var(--night);color:#fff;border-radius:6px;padding:22px 20px;
+         padding-top:calc(22px + env(safe-area-inset-top))}
+  .eyebrow{font-size:10px;letter-spacing:.2em;font-weight:700;color:var(--beam);margin:0 0 6px}
+  h1{font-family:Georgia,serif;font-size:28px;margin:0 0 6px;font-weight:700}
+  header p{margin:0;font-size:13.5px;color:rgba(255,255,255,.82)}
+
+  #notices{margin:12px 0 0}
+  .notice{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:11px 12px;
+          margin-bottom:8px;font-size:12.5px;color:var(--slate)}
+  .notice.warn{border-color:#d7b56d;background:#fffaf0;color:#6d4a00}
+  .notice strong{color:var(--ink)}
+  .notice button{float:right;border:0;background:none;color:var(--night);font-weight:700;
+                 font-size:12px;padding:0 0 0 10px;cursor:pointer}
+
+  nav{display:flex;gap:6px;margin:18px 0}
+  nav button{flex:1;padding:10px 4px;font-size:13px;font-weight:600;border-radius:5px;
+             border:1px solid var(--rule);background:#fff;color:var(--slate);cursor:pointer}
+  nav button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+  .card{background:#fff;border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+  .tag{padding:9px 16px;font-size:10.5px;letter-spacing:.14em;font-weight:700;color:#fff}
+  .Maths{background:#1E3A8A}.Science{background:#166534}
+  .English{background:#B45309}.Chinese{background:#9F1239}
+  .body{padding:22px 20px}
+  .q{font-size:17px;line-height:1.5;margin:0 0 18px}
+  .commit{font-size:13px;color:var(--slate);background:#f7f8fa;border-radius:5px;padding:10px 12px;margin:0 0 12px}
+  .a{border-left:4px solid var(--beam);padding-left:14px;margin-bottom:18px}
+  .a p{margin:0 0 8px}
+  .a .why{font-size:13.5px;color:var(--slate);font-style:italic;margin:0}
+
+  button.big{width:100%;padding:14px;border:none;border-radius:5px;font-size:15px;
+             font-weight:700;color:#fff;background:var(--night);cursor:pointer}
+  .row{display:flex;gap:8px}
+  .row button{flex:1;padding:14px;border:none;border-radius:5px;font-size:15px;
+              font-weight:700;color:#fff;cursor:pointer}
+  .miss{background:var(--miss)}.good{background:var(--good)}
+
+  label{display:block;font-size:10.5px;letter-spacing:.12em;font-weight:700;
+        color:var(--slate);margin:0 0 6px}
+  textarea,input{width:100%;border:1px solid #cbd5e1;border-radius:5px;padding:11px;
+                 font:inherit;font-size:15px;margin-bottom:16px;background:#fff;color:var(--ink)}
+  textarea{resize:vertical}
+  .subs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .subs button{flex:1;min-width:70px;padding:10px 6px;border:none;border-radius:5px;
+               font-size:13px;font-weight:600;background:#e8eaee;color:var(--slate);cursor:pointer}
+  .subs button.on{background:var(--ink);color:#fff}
+  .form-error{font-size:12.5px;color:var(--miss);margin:-6px 0 14px;font-weight:600}
+
+  .item{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:12px 14px;
+        margin-bottom:8px;display:flex;gap:11px;align-items:flex-start}
+  .pill{font-size:9.5px;font-weight:700;color:#fff;padding:4px 7px;border-radius:4px;flex:0 0 auto}
+  .item .txt{flex:1;min-width:0;font-size:13.5px}
+  .item .meta{font-size:11.5px;color:#94a3b8;margin-top:3px}
+  .item .actions{display:flex;gap:10px;margin-top:6px}
+  .item .actions button{border:0;background:none;padding:0;color:var(--night);font-size:11.5px;
+                        text-decoration:underline;cursor:pointer}
+  .item .actions button.delete{color:var(--miss)}
+
+  .empty{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:40px 24px;text-align:center}
+  .empty strong{display:block;font-size:18px;margin-bottom:6px}
+  .empty span{font-size:14px;color:var(--slate)}
+  .foot{margin-top:22px;text-align:center}
+  .foot button{background:none;border:none;color:#94a3b8;font-size:12px;
+               text-decoration:underline;cursor:pointer;padding:6px}
+
+
+  .pinyin{font-size:12.5px;color:#64748b;margin:-12px 0 14px;font-style:italic}
+  .gloss{font-size:12.5px;color:#64748b;margin:-8px 0 14px}
+  .step{font-size:11px;letter-spacing:.12em;font-weight:700;color:#94a3b8;margin:0 0 8px}
+  .step-title{font-size:18px;font-weight:700;margin:0 0 14px}
+  .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+  .choice-grid button{padding:11px 9px;border:1px solid var(--rule);border-radius:5px;background:#fff;
+                      color:var(--ink);font-size:13px;font-weight:600;cursor:pointer}
+  .choice-grid button:hover,.choice-grid button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .navrow{display:flex;gap:8px;margin-top:4px}
+  .navrow button{flex:1;padding:12px;border:none;border-radius:5px;font-size:14px;font-weight:700;cursor:pointer}
+  .secondary{background:#64748b!important}
+  .quiet{background:none;border:none;color:#64748b;text-decoration:underline;font-size:12.5px;cursor:pointer;padding:8px}
+  .caught{background:#f0f7f3;border:1px solid #c9e2d4;border-radius:6px;padding:14px;margin-bottom:14px}
+  .caught strong{display:block;color:var(--good);font-size:16px;margin-bottom:3px}
+  .bonusbox{background:#fff8e8;border:1px solid #ecd08a;border-radius:6px;padding:16px;text-align:center;margin-top:12px}
+  .bonusbox strong{display:block;font-size:18px;margin-bottom:4px}
+  .bonusbox span{display:block;color:var(--slate);font-size:13.5px;margin-bottom:12px}
+  .stretch{background:#6B4E00}
+  .tiny{font-size:11.5px;color:#94a3b8;margin-top:8px}
+  .review-prefill{background:#f7f8fa;border:1px solid var(--rule);border-radius:5px;padding:12px;margin-bottom:16px}
+
+  /* 20e English Precision + Vocabulary Precision Tier 2 */
+  .module-nav{margin:-8px 0 18px}
+  .module-nav button{width:100%;padding:11px 12px;border:1px solid #d9a21b;border-radius:5px;
+                     background:#fff8e8;color:var(--ink);font-size:13px;font-weight:700;cursor:pointer}
+  .module-nav button.on{background:var(--beam);border-color:var(--beam);color:var(--ink)}
+  .precision-hero{background:linear-gradient(180deg,#fffaf0 0%,#fff 100%);border:1px solid #ecd08a;
+                  border-radius:6px;padding:18px;margin-bottom:12px}
+  .precision-hero h2{font-family:Georgia,serif;font-size:22px;margin:0 0 5px}
+  .precision-hero p{margin:0;color:var(--slate);font-size:13.5px}
+  .precision-rule{margin-top:10px;padding:10px 12px;background:#fff;border-left:4px solid var(--beam);
+                  font-weight:700;font-size:13px}
+  .precision-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 14px}
+  .metric{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:12px}
+  .metric strong{display:block;font-size:20px;line-height:1.2}
+  .metric span{font-size:11.5px;color:var(--slate)}
+  .ep-progress{font-size:11px;letter-spacing:.1em;font-weight:700;color:#94a3b8;margin:0 0 8px}
+  .ep-context{background:#f7f8fa;border:1px solid var(--rule);border-radius:6px;padding:13px 14px;
+              margin-bottom:15px;font-size:14px;line-height:1.65}
+  .ep-blank{display:inline-block;min-width:64px;border-bottom:2px solid var(--beam);color:var(--ink);font-weight:700;text-align:center}
+  .confidence{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:16px}
+  .confidence button{padding:10px 6px;border:1px solid var(--rule);border-radius:5px;background:#fff;
+                     color:var(--slate);font-size:12px;font-weight:700;cursor:pointer}
+  .confidence button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .ep-review-note{background:#fff8e8;border:1px solid #ecd08a;border-radius:6px;padding:11px 12px;
+                  color:#6d4a00;font-size:12.5px;margin-bottom:14px}
+  .ep-good{background:#f0f7f3;border:1px solid #c9e2d4;border-radius:6px;padding:13px;margin:14px 0}
+  .ep-miss{background:#fff4f2;border:1px solid #e8c2bc;border-radius:6px;padding:13px;margin:14px 0}
+  .ep-good strong{color:var(--good)} .ep-miss strong{color:var(--miss)}
+  .tagline{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+  .tagchip{font-size:10px;font-weight:700;letter-spacing:.05em;padding:4px 7px;border-radius:4px;background:#eef2f6;color:var(--slate)}
+  .weak-list{margin:8px 0 16px;padding:0;list-style:none}
+  .weak-list li{background:#fff;border:1px solid var(--rule);border-radius:5px;padding:9px 11px;margin-bottom:6px;font-size:13px}
+  .session-line{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--rule);padding:9px 0;font-size:12.5px}
+  .session-line:first-child{border-top:0}
+  .vocab-options{display:grid;gap:8px;margin:0 0 16px}
+  .vocab-options button{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:11px 12px;border:1px solid var(--rule);border-radius:6px;background:#fff;color:var(--ink);font:inherit;font-size:13.5px;cursor:pointer}
+  .vocab-options button.on{background:#eef3f9;border-color:var(--night);box-shadow:inset 0 0 0 1px var(--night)}
+  .vocab-options button:disabled{cursor:default;opacity:1}
+  .vocab-letter{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;border-radius:50%;background:#eef2f6;color:var(--slate);font-size:11px;font-weight:800}
+  .vocab-options button.on .vocab-letter{background:var(--night);color:#fff}
+  .vocab-lane{background:#fffaf0;border:1px solid #ecd08a;border-radius:6px;padding:16px;margin-top:10px}
+  .vocab-lane h3{font-family:Georgia,serif;font-size:18px;margin:0 0 5px}
+  .vocab-lane p{font-size:12.5px;color:var(--slate);margin:0 0 10px}
+  .vocab-tags{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 12px}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">PROJECT LIGHTHOUSE 2.0</p>
+    <h1>The Beacon</h1>
+    <p>Five cards, five minutes, at the end of the day. The ones you miss come back sooner.</p>
+  </header>
+
+  <div id="notices"></div>
+
+  <nav>
+    <button id="t-today" class="on">Today</button>
+    <button id="t-add">Review mistakes</button>
+    <button id="t-all">All cards</button>
+  </nav>
+  <div class="module-nav"><button id="t-english">English Precision</button></div>
+
+  <main id="view"></main>
+
+  <div class="foot">
+    <button id="export">Back up my cards</button>
+    <button id="restore">Restore from backup</button>
+    <input type="file" id="file" accept="application/json,.json" style="display:none">
+    <div style="font-size:11px;color:#b6bfcb;margin-top:2px">The Beacon · Release 20e · English + Vocabulary Precision Tier 2 · 2026-09-01</div>
+  </div>
+</div>
+
+<script>
+const DAY=86400000, INTERVALS=[1,3,7,14,30];
+const today=()=>new Date().setHours(0,0,0,0);
+const SUBJECTS=["Maths","Science","English","Chinese"];
+const PLAN=["Science","Science","Maths","Language","Any"];
+const LANG=["English","Chinese"];
+const BONUS_PLAN=["Science","Maths","Language"];
+const ERROR_FIRST_SLOTS=2;
+const FINAL_WINDOW_DAYS=7;
+const BACKUP_AFTER_DAYS=3;
+const MAX_BONUS=3;
+const STATE_KEY="beacon-state";
+const ENGLISH_STATE_KEY="beacon:english:precision";
+const ENGLISH_RELEASE="20e";
+const EXAMS={
+  English:new Date(2026,8,24).setHours(0,0,0,0),
+  Maths:new Date(2026,8,25).setHours(0,0,0,0),
+  Chinese:new Date(2026,8,28).setHours(0,0,0,0),
+  Science:new Date(2026,8,29).setHours(0,0,0,0)
+};
+
+const SEED=[
+["Maths","A tank is 3/5 filled. After 12 L more it is 7/10 full. What is its capacity?","120 L. The 12 L is 7/10 − 3/5 = 1/10 of the tank.","Find what fraction the added amount represents before anything else."],
+["Maths","Boys : girls = 3 : 5. There are 24 more girls than boys. How many children altogether?","96. The difference is 2 units = 24, so 1 unit = 12, and 8 units = 96.","The difference in units is the bridge between the ratio and the real number."],
+["Maths","A car covers 180 km in 2 h 30 min. What is its average speed?","72 km/h. 180 ÷ 2.5.","Convert minutes into a decimal or fraction of an hour before dividing."],
+["Maths","Find the area of a quadrant of radius 14 cm. Take π as 22/7.","154 cm². A quarter of the full circle, which is 22/7 × 14 × 14 = 616.","Work out the whole circle first, then take the fraction."],
+["Maths","An $80 item rises 15%, then is discounted 10%. What is the final price?","$82.80. 80 × 1.15 = 92, then 92 × 0.9.","Percentages apply one after another. They are never added together."],
+["Maths","The angles of a triangle are in the ratio 2 : 3 : 4. Find the largest angle.","80°. 9 units = 180°, so 1 unit = 20°, and 4 units = 80°.","The total units always map onto 180° for a triangle."],
+["Science","Why does a plant kept in a dark cupboard eventually die, even if it is watered?","Without light it cannot photosynthesise, so it cannot make food, and its stored food runs out.","Name the process and the reason. 'No sunlight' on its own will not score."],
+["Science","A metal spoon feels colder than a wooden one in the same room. Explain why.","Metal is a better conductor of heat, so it conducts heat away from your hand faster.","Both are at the same temperature. The answer is about the rate of heat transfer."],
+["Science","In a fair test on how light affects plant growth, name one variable you must keep the same.","The amount of water. Also: soil type, pot size, type of plant, temperature.","Change one thing, measure one thing, keep everything else the same."],
+["Science","A seed has a papery wing. How is it dispersed, and how does that help the plant?","By wind. It lands further from the parent plant, so there is less competition for water, sunlight and nutrients.","Always add the benefit. The mark is usually in the 'why'."],
+["Science","Name the stages of a butterfly's life cycle.","Egg → larva (caterpillar) → pupa → adult. This is complete metamorphosis.","Butterfly and beetle have four stages. Grasshopper and cockroach have three."],
+["Science","Why do water droplets form on the outside of a cold glass?","Water vapour in the surrounding air loses heat to the cold glass and condenses into water droplets.","Say where the water came from. It did not leak through the glass."],
+["English","Combine using 'Despite': 'He was exhausted. He kept working.'","Despite being exhausted, he kept working.","'Despite' is followed by a noun or an -ing verb, never by a full clause."],
+["English","Choose: 'Neither of the boys (was / were) willing to admit it.'","was — 'neither' is singular.","Look past the words sitting between the subject and the verb."],
+["English","What does 'meticulous' mean? Use it in a sentence.","Extremely careful about detail. 'She kept meticulous notes of every experiment.'","Give the meaning and a natural sentence. One without the other rarely scores."],
+["English","Rewrite in reported speech: 'I will finish it tomorrow,' she said.","She said that she would finish it the following day.","Shift the tense back, and change the time word too."],
+["English","Choose: 'The news (is / are) encouraging.'","is — 'news' is uncountable.","Uncountable nouns take a singular verb even when they end in -s."],
+["Chinese","一丝不苟 是什么意思？","形容做事非常认真细致，一点也不马虎。","成语题先想清楚它形容的是态度还是结果。"],
+["Chinese","兴高采烈 用在什么情况？请造一个句子。","形容非常高兴。例：听到可以去露营，大家都兴高采烈。","成语要放进完整的句子里才算真正掌握。"],
+["Chinese","填量词：一（  ）书、一（  ）花、一（  ）马","一本书、一朵花、一匹马。","量词要一组一组地记，不要单个背。"],
+["Chinese","用「虽然……但是……」造一个句子。","例：虽然天气很热，但是他还是坚持跑步。","关联词要成对使用，前后句的意思要相反。"]
+];
+
+const BUILTIN_META={
+  "seed-17":{
+    promptPinyin:"yī sī bù gǒu shì shén me yì si?",
+    answerPinyin:"xíng róng zuò shì fēi cháng rèn zhēn xì zhì, yì diǎn yě bù mǎ hu.",
+    answerGloss:"一丝不苟 (yī sī bù gǒu): meticulous; extremely careful and thorough."
+  },
+  "seed-18":{
+    promptPinyin:"xìng gāo cǎi liè yòng zài shén me qíng kuàng? qǐng zào yí ge jù zi.",
+    answerPinyin:"xíng róng fēi cháng gāo xìng. lì: tīng dào kě yǐ qù lù yíng, dà jiā dōu xìng gāo cǎi liè.",
+    answerGloss:"兴高采烈 (xìng gāo cǎi liè): delighted; in very high spirits."
+  },
+  "seed-19":{
+    promptPinyin:"tián liàng cí: yì (  ) shū, yì (  ) huā, yì (  ) mǎ.",
+    answerPinyin:"yì běn shū, yì duǒ huā, yì pǐ mǎ.",
+    answerGloss:"Measure words: 本 (běn) for books, 朵 (duǒ) for flowers, 匹 (pǐ) for horses."
+  },
+  "seed-20":{
+    promptPinyin:"yòng 'suī rán……dàn shì……' zào yí ge jù zi.",
+    answerPinyin:"lì: suī rán tiān qì hěn rè, dàn shì tā hái shì jiān chí pǎo bù.",
+    answerGloss:"虽然……但是…… (suī rán… dàn shì…): although… but…"
+  }
+};
+
+const STRETCH=[
+  {id:"stretch-sci-001",subject:"Science",
+   prompt:"Two identical glasses contain the same amount of water. Glass A contains ice while Glass B contains water at room temperature. More droplets form on the outside of Glass A. Explain why.",
+   answer:"The surface of Glass A is colder, so water vapour in the surrounding air loses heat faster and more of it condenses into liquid water on the outside of the glass.",
+   note:"Compare the changed condition, name the process, then state the effect."},
+  {id:"stretch-sci-002",subject:"Science",
+   prompt:"A plant is placed under a transparent plastic bag in sunlight. After some time, droplets appear on the inside of the bag. Explain how the droplets formed.",
+   answer:"Water from the plant is lost as water vapour through transpiration. The water vapour touches the cooler inner surface of the bag, loses heat and condenses into water droplets.",
+   note:"Link the source of the water to transpiration, then condensation."},
+  {id:"stretch-sci-003",subject:"Science",
+   prompt:"Wet clothes dry faster on a windy day than on a still day even when the temperature is the same. Explain why.",
+   answer:"Wind carries away water vapour near the wet clothes, so the surrounding air is less humid and water can evaporate from the clothes faster.",
+   note:"Do not say only 'wind dries it'. Explain how moving air increases evaporation."},
+  {id:"stretch-sci-004",subject:"Science",
+   prompt:"Two identical bulbs are connected to identical batteries. Circuit X has one bulb. Circuit Y has two bulbs connected in series. Why are the bulbs in Circuit Y dimmer?",
+   answer:"In Circuit Y the electrical energy supplied by the battery is shared by two bulbs in the same circuit, so each bulb receives less energy per unit time and is dimmer.",
+   note:"Compare the circuits and explain the energy effect, not just the observation."},
+
+  {id:"stretch-math-001",subject:"Maths",
+   prompt:"The ratio of red to blue beads is 3 : 5. After 12 red beads are added, the ratio becomes 3 : 4. How many beads were there at first?",
+   answer:"128 beads. Let red = 3u and blue = 5u. After adding 12 red: (3u+12):5u = 3:4. So 4(3u+12)=15u, giving u=16. Initial total = 8u = 128.",
+   note:"When only one group changes, keep the unchanged group as the invariant."},
+  {id:"stretch-math-002",subject:"Maths",
+   prompt:"A price is increased by 20% and then reduced by 20%. The final price is $96. What was the original price?",
+   answer:"$100. The combined multiplier is 1.2 × 0.8 = 0.96. So original price = 96 ÷ 0.96 = 100.",
+   note:"Equal percentage increase and decrease do not cancel. Work with multipliers."},
+  {id:"stretch-math-003",subject:"Maths",
+   prompt:"A tank was 2/5 full. After 18 L was added, it became 5/8 full. How much water is in the tank when it is completely full?",
+   answer:"80 L. The increase is 5/8 − 2/5 = 25/40 − 16/40 = 9/40. If 9/40 = 18 L, then the full tank is 18 × 40 ÷ 9 = 80 L.",
+   note:"First find what fraction of the whole the change represents."},
+  {id:"stretch-math-004",subject:"Maths",
+   prompt:"A train travels 2/5 of a journey at 60 km/h and the remaining 90 km at 75 km/h. What is the total length of the journey?",
+   answer:"150 km. The remaining 90 km is 3/5 of the journey, so the whole journey is 90 ÷ 3 × 5 = 150 km.",
+   note:"The speeds are distractors here. Identify what the 90 km represents first."},
+
+  {id:"stretch-eng-001",subject:"English",
+   prompt:"Choose the correct verb: 'Neither the coach nor the players (was / were) prepared for the sudden change.'",
+   answer:"were. With 'neither...nor', the verb agrees with the subject closer to it. 'Players' is plural.",
+   note:"Find the noun nearest the verb instead of being distracted by the first subject."},
+  {id:"stretch-eng-002",subject:"English",
+   prompt:"Rewrite without changing the meaning: 'You must leave now, or you will miss the last bus.' Begin with 'Unless'.",
+   answer:"Unless you leave now, you will miss the last bus.",
+   note:"Unless already carries the negative condition. Do not add another 'not'."},
+  {id:"stretch-eng-003",subject:"English",
+   prompt:"In the sentence 'Maya gave a tentative answer, glancing at her teacher for reassurance,' what does 'tentative' most likely mean?",
+   answer:"Uncertain or hesitant. Her glance for reassurance shows that she is not confident about her answer.",
+   note:"Use the surrounding evidence, not just a memorised dictionary meaning."},
+  {id:"stretch-eng-004",subject:"English",
+   prompt:"Which sentence is correct? A) The team of runners are ready. B) The team of runners is ready. Explain.",
+   answer:"B. 'Team' is the head noun and is treated as a singular collective noun here; 'of runners' does not change the subject.",
+   note:"Strip away the prepositional phrase to find the real subject."},
+
+  {id:"stretch-chi-001",subject:"Chinese",
+   prompt:"阅读句子：虽然比赛输了，他却没有垂头丧气，反而鼓励队友。这里的「垂头丧气」最接近什么意思？",
+   promptPinyin:"yuè dú jù zi: suī rán bǐ sài shū le, tā què méi yǒu chuí tóu sàng qì, fǎn ér gǔ lì duì yǒu. zhè lǐ de 'chuí tóu sàng qì' zuì jiē jìn shén me yì si?",
+   answer:"形容因为失败或不顺利而情绪低落、失去精神。",
+   answerPinyin:"xíng róng yīn wèi shī bài huò bù shùn lì ér qíng xù dī luò, shī qù jīng shén.",
+   answerGloss:"垂头丧气 (chuí tóu sàng qì): dejected or discouraged after a setback.",
+   note:"Use the contrast in the sentence: he lost, but did not become discouraged."},
+  {id:"stretch-chi-002",subject:"Chinese",
+   prompt:"小明看到天色越来越暗，便加快脚步回家。根据句子，为什么小明加快脚步？",
+   promptPinyin:"xiǎo míng kàn dào tiān sè yuè lái yuè àn, biàn jiā kuài jiǎo bù huí jiā. gēn jù jù zi, wèi shén me xiǎo míng jiā kuài jiǎo bù?",
+   answer:"因为天色越来越暗，他想在天黑以前赶快回家。",
+   answerPinyin:"yīn wèi tiān sè yuè lái yuè àn, tā xiǎng zài tiān hēi yǐ qián gǎn kuài huí jiā.",
+   answerGloss:"Evidence first: the darkening sky explains why he hurried home.",
+   note:"Answer from the evidence in the sentence, then make the inference explicit."},
+  {id:"stretch-chi-003",subject:"Chinese",
+   prompt:"选择最合适的词语：他已经很累了，_____ 还是坚持把功课做完。A. 因为  B. 却  C. 所以  D. 如果",
+   promptPinyin:"xuǎn zé zuì hé shì de cí yǔ: tā yǐ jīng hěn lèi le, _____ hái shì jiān chí bǎ gōng kè zuò wán.",
+   answer:"B. 却。前后意思形成转折：虽然很累，他仍然坚持完成。",
+   answerPinyin:"B. què. qián hòu yì si xíng chéng zhuǎn zhé: suī rán hěn lèi, tā réng rán jiān chí wán chéng.",
+   answerGloss:"却 (què): yet / however; it marks a contrast.",
+   note:"Look at the relationship between the two clauses before choosing the connector."},
+  {id:"stretch-chi-004",subject:"Chinese",
+   prompt:"选择正确的词语：老师的解释很清楚，同学们马上作出了正确的（反应 / 反映）。",
+   promptPinyin:"xuǎn zé zhèng què de cí yǔ: lǎo shī de jiě shì hěn qīng chǔ, tóng xué men mǎ shàng zuò chū le zhèng què de (fǎn yìng / fǎn yìng).",
+   answer:"反应。这里指听到解释后作出的回应；「反映」通常指把情况、意见表现或报告出来。",
+   answerPinyin:"fǎn yìng. zhè lǐ zhǐ tīng dào jiě shì hòu zuò chū de huí yìng; 'fǎn yìng' tōng cháng zhǐ bǎ qíng kuàng, yì jiàn biǎo xiàn huò bào gào chū lái.",
+   answerGloss:"反应: reaction/response. 反映: reflect/report a situation or opinion.",
+   note:"Use meaning in context, not sound alone. These two words share the same pronunciation."}
+];
+
+
+const EP_TAG_LABELS={
+  COL:"Collocation",GRM:"Grammar / agreement",SEM:"Meaning / context",SYN:"S&T structure",
+  REF:"Reference tracking",PREP:"Preposition / fixed phrase",TENSE:"Tense / time shift",
+  EXE:"Execution / checking",INT:"High-confidence intuition lure",OVR:"Overthinking",TRF:"Transfer"
+};
+const VOCAB_TAG_LABELS={
+  CTX:"Meaning in context",FIT:"Exact lexical fit",NUANCE:"Near-synonym precision",
+  MORPH:"Word meaning / morphology",COLLOC:"Vocabulary in phrases",
+  CONNOT:"Connotation / tone",INFER:"Multi-sentence inference"
+};
+
+const EP_DIAGNOSTIC=[
+  {id:"ep-d-01",section:"Cloze",weight:1,tags:["COL","SEM"],prompt:"Fill Blank 1 with one suitable word.",
+   context:"At first, the damage attracted little [[BLANK]]. Only a few narrow tracks were visible, and it was easy to imagine that the grass would soon recover.",
+   accepted:["attention","notice"],answer:"attention",rule:"Check the whole phrase, not just the blank: ‘attract attention’ is the strongest collocation."},
+  {id:"ep-d-02",section:"Cloze",weight:1,tags:["SEM"],prompt:"Fill Blank 2 with one suitable word.",
+   context:"Only a few narrow tracks were visible, and it was easy to imagine that the grass would soon recover. Yet the problem did not end [[BLANK]]. Each rider who followed the same route pressed the soil more firmly.",
+   accepted:["there"],answer:"there",rule:"Use the discourse link: ‘did not end there’ points forward to a continuing problem."},
+  {id:"ep-d-03",section:"Cloze",weight:1,tags:["COL","SEM"],prompt:"Fill Blank 3 with one suitable word.",
+   context:"The moving water carried loose soil downhill and gradually exposed the roots of nearby plants. What appeared to be a harmless shortcut was actually setting off a [[BLANK]] of small changes.",
+   accepted:["chain","series"],answer:"chain",rule:"Look for a noun that expresses linked consequences: a chain of changes."},
+  {id:"ep-d-04",section:"Cloze",weight:1,tags:["COL"],prompt:"Fill Blank 4 with one suitable word.",
+   context:"The officers considered putting up more warning signs. However, they knew that signs alone might have little [[BLANK]] if riders did not understand why the restriction existed.",
+   accepted:["effect","impact"],answer:"effect",rule:"The fixed phrase is ‘have little effect/impact’."},
+  {id:"ep-d-05",section:"Cloze",weight:1,tags:["GRM","COL"],prompt:"Fill Blank 5 with one suitable word.",
+   context:"Their aim was not merely to tell visitors what they were [[BLANK]] to do, but to explain the reason behind the rule.",
+   accepted:["supposed","expected"],answer:"supposed",rule:"Recognise the fixed construction ‘be supposed to + verb’."},
+  {id:"ep-d-06",section:"Cloze",weight:1,tags:["GRM","SEM"],prompt:"Fill Blank 6 with one suitable word.",
+   context:"Most riders returned to the marked path, although a small number continued using the shortcut. Rather than [[BLANK]] that the campaign had failed, the officers continued monitoring the area for another month.",
+   accepted:["concluding","assuming","deciding"],answer:"concluding",rule:"After ‘rather than’ here, an -ing form fits the parallel action and the logic of the sentence."},
+  {id:"ep-d-07",section:"Cloze",weight:1,tags:["SEM"],prompt:"Fill Blank 7 with one suitable word.",
+   context:"The episode demonstrated how easily people can [[BLANK]] the effect of repeated actions when each individual action seems insignificant.",
+   accepted:["underestimate","misjudge"],answer:"underestimate",rule:"The clue is ‘seems insignificant’: the effect is judged as smaller than it really is."},
+  {id:"ep-d-08",section:"Cloze",weight:1,tags:["SEM","COL"],prompt:"Fill Blank 8 with one suitable word.",
+   context:"It also showed that people may be more willing to follow rules when they understand the [[BLANK]] behind them.",
+   accepted:["reason","reasons","reasoning","logic"],answer:"reason",rule:"Use the wider paragraph: the display explained why the restriction existed."},
+  {id:"ep-d-09",section:"Cloze",weight:1,tags:["COL","SEM"],prompt:"Fill Blank 9 with one suitable word.",
+   context:"A warning may stop someone once. Understanding, however, can influence what that person chooses to do later, even when nobody is present to [[BLANK]] the rule.",
+   accepted:["enforce","explain"],answer:"enforce",rule:"The verb must mean making sure a rule is obeyed: enforce the rule."},
+  {id:"ep-d-10",section:"Cloze",weight:1,tags:["REF","COL"],prompt:"Fill Blank 10 with one suitable word.",
+   context:"Changing behaviour often requires more than simply giving instructions. People also need enough information to judge a situation for [[BLANK]].",
+   accepted:["themselves"],answer:"themselves",rule:"The subject is plural ‘people’, so the reflexive pronoun is ‘themselves’."},
+  {id:"ep-d-11",section:"S&T",weight:2,tags:["SYN","GRM"],prompt:"Rewrite beginning with ‘Despite’. Do not change the meaning.",
+   context:"Although Rina had checked the address twice, she still went to the wrong building.",
+   accepted:["despite having checked the address twice rina still went to the wrong building","despite checking the address twice rina still went to the wrong building"],
+   answer:"Despite having checked the address twice, Rina still went to the wrong building.",rule:"‘Despite’ takes a noun phrase or -ing construction, not a full finite clause."},
+  {id:"ep-d-12",section:"S&T",weight:2,tags:["SYN","TENSE"],prompt:"Rewrite beginning with ‘Priya has’. Do not change the meaning.",
+   context:"The last time Priya visited the library was two months ago.",
+   accepted:["priya has not visited the library for two months"],answer:"Priya has not visited the library for two months.",
+   rule:"Use present perfect with ‘for’ to describe a period continuing up to now."},
+  {id:"ep-d-13",section:"S&T",weight:2,tags:["SYN"],prompt:"Rewrite using the word ‘too’. Do not change the meaning.",
+   context:"The parcel was so large that it could not fit into the locker.",
+   accepted:["the parcel was too large to fit into the locker"],answer:"The parcel was too large to fit into the locker.",rule:"Use ‘too + adjective + to-infinitive’ without rebuilding the subject unnecessarily."},
+  {id:"ep-d-14",section:"S&T",weight:2,tags:["SYN","TENSE","REF"],prompt:"Rewrite beginning with ‘Grace told Tom that’. Do not change the meaning.",
+   context:"Grace said to Tom, ‘I will return your notes tomorrow.’",
+   accepted:["grace told tom that she would return his notes the following day","grace told tom that she would return his notes the next day"],
+   answer:"Grace told Tom that she would return his notes the following day.",rule:"Track all four shifts: I→she, will→would, your→his, tomorrow→the following/next day."},
+  {id:"ep-d-15",section:"S&T",weight:2,tags:["SYN","TENSE"],prompt:"Rewrite beginning with ‘It was only’. Do not change the meaning.",
+   context:"Mr Ong realised that he had left his keys at home only when he reached his office.",
+   accepted:["it was only when mr ong reached his office that he realised that he had left his keys at home","it was only when mr ong reached his office that he realised he had left his keys at home"],
+   answer:"It was only when Mr Ong reached his office that he realised that he had left his keys at home.",rule:"Preserve the sequence: reaching the office triggers the later realisation; ‘had left’ stays earlier in time."}
+];
+
+const EP_SPRINT_01_IDS=["ep-b20-01","ep-b20-04","ep-b20-02","ep-b20-05","ep-b20-03","ep-b20-06"];
+const EP_SPRINT_02_IDS=["ep-p-09","ep-c20-01","ep-p-07","ep-c20-02","ep-p-13","ep-c20-03"];
+
+const EP_DRILL_BANK=[
+  {id:"ep-b20-01",section:"Cloze",weight:1,tags:["SEM","COL"],retired:true,prompt:"Fill the blank with one suitable word.",
+   context:"Many residents crossed the old footbridge every day, so Aaron assumed it was safe. The engineer warned him that frequent use was not [[BLANK]] of the bridge’s strength.",
+   accepted:["proof","evidence","assurance"],answer:"proof",rule:"20c retires this item from future selection because the frame admits more than one defensible completion."},
+  {id:"ep-b20-02",section:"Cloze",weight:1,tags:["COL","SEM"],prompt:"Fill the blank with one suitable word.",
+   context:"The researchers repeated the experiment three times before they were willing to [[BLANK]] a conclusion from the results.",
+   accepted:["draw","reach"],answer:"draw",rule:"Use the natural academic collocation: draw/reach a conclusion. A merely plausible verb is not enough."},
+  {id:"ep-b20-03",section:"Cloze",weight:1,tags:["SEM","INT"],prompt:"Fill the blank with one suitable word.",
+   context:"The notice did not forbid visitors from entering the garden. It simply asked them to remain on the path to [[BLANK]] the newly planted flowers.",
+   accepted:["protect","preserve","save"],answer:"protect",rule:"Read the purpose across both sentences. The rule exists to protect the flowers, not merely to control the visitors."},
+  {id:"ep-b20-04",section:"S&T",weight:2,tags:["TENSE","SYN"],prompt:"Begin with ‘Sam has’. Do not change the meaning.",
+   context:"The last time Sam ate at this restaurant was three months ago.",
+   accepted:["sam has not eaten at this restaurant for three months"],answer:"Sam has not eaten at this restaurant for three months.",rule:"Present perfect + a continuing period uses ‘for’: has not eaten … for three months."},
+  {id:"ep-b20-05",section:"S&T",weight:2,tags:["SYN"],prompt:"Rewrite using the word ‘too’. Do not change the meaning.",
+   context:"The box was so wide that it could not pass through the doorway.",
+   accepted:["the box was too wide to pass through the doorway"],answer:"The box was too wide to pass through the doorway.",rule:"Transform the whole frame: so + adjective + that … could not → too + adjective + to-infinitive."},
+  {id:"ep-b20-06",section:"S&T",weight:2,tags:["EXE","SYN","TENSE","REF"],prompt:"Begin exactly with ‘Nadia told Evan that’. Do not change the meaning.",
+   context:"Nadia said to Evan, ‘I will email your teacher tomorrow.’",
+   accepted:["nadia told evan that she would email his teacher the following day","nadia told evan that she would email his teacher the next day"],answer:"Nadia told Evan that she would email his teacher the following day.",rule:"Use every given starter word, then check each shift: I→she, will→would, your→his, tomorrow→the following/next day."},
+  {id:"ep-p-01",section:"Cloze",weight:1,tags:["COL"],prompt:"Fill the blank with one suitable word.",context:"The editor paid close [[BLANK]] to every date and name before the article was published.",accepted:["attention"],answer:"attention",rule:"The collocation is ‘pay close attention to’."},
+  {id:"ep-p-02",section:"Cloze",weight:1,tags:["GRM"],prompt:"Fill the blank with one suitable word.",context:"Neither of the explanations [[BLANK]] convincing enough to settle the argument.",accepted:["was"],answer:"was",rule:"‘Neither’ is singular when used as the subject here."},
+  {id:"ep-p-03",section:"Cloze",weight:1,tags:["PREP","COL"],prompt:"Fill the blank with one suitable word.",context:"The instructions were divided [[BLANK]] three simple stages so that everyone could follow them.",accepted:["into"],answer:"into",rule:"Something is divided ‘into’ parts or groups."},
+  {id:"ep-p-04",section:"Cloze",weight:1,tags:["PREP","COL"],prompt:"Fill the blank with one suitable word.",context:"Mira was responsible [[BLANK]] checking that every window had been locked.",accepted:["for"],answer:"for",rule:"The fixed construction is ‘responsible for + noun/-ing’."},
+  {id:"ep-p-05",section:"Cloze",weight:1,tags:["REF"],prompt:"Fill the blank with one suitable word.",context:"The two sisters built the model entirely by [[BLANK]], refusing any help from their parents.",accepted:["themselves"],answer:"themselves",rule:"Plural subject ‘sisters’ requires the reflexive ‘themselves’."},
+  {id:"ep-p-06",section:"Cloze",weight:1,tags:["SEM"],prompt:"Fill the blank with one suitable word.",context:"He had rehearsed the speech for weeks. [[BLANK]], he still felt nervous when his name was called.",accepted:["however","nevertheless"],answer:"However",rule:"The second sentence contrasts with the expectation created by the first."},
+  {id:"ep-p-07",section:"Cloze",weight:1,tags:["SEM"],retired:true,prompt:"Fill the blank with one suitable word.",context:"The scientist refused to draw a firm conclusion [[BLANK]] the results had been repeated several times.",accepted:["until","although"],answer:"until",rule:"20d retires this item because more than one defensible connector can fit the sentence."},
+  {id:"ep-p-08",section:"Cloze",weight:1,tags:["COL"],prompt:"Fill the blank with one suitable word.",context:"The sudden downpour had little [[BLANK]] on the runners, who continued at the same pace.",accepted:["effect","impact"],answer:"effect",rule:"Use the collocation ‘have little effect/impact on’."},
+  {id:"ep-p-09",section:"Cloze",weight:1,tags:["COL","PREP"],prompt:"Fill the blank with one suitable word.",context:"Before answering, take the entire paragraph [[BLANK]] account rather than relying on one sentence.",accepted:["into"],answer:"into",rule:"The fixed phrase is ‘take something into account’."},
+  {id:"ep-p-10",section:"Cloze",weight:1,tags:["GRM","PREP"],prompt:"Fill the blank with one suitable word.",context:"Her explanation was clear enough [[BLANK]] everyone to follow.",accepted:["for"],answer:"for",rule:"Use ‘adjective + enough + for + person + to-infinitive’."},
+  {id:"ep-p-11",section:"Cloze",weight:1,tags:["SEM"],prompt:"Fill the blank with one suitable word.",context:"The hikers remained under the shelter [[BLANK]] the storm had passed.",accepted:["until"],answer:"until",rule:"‘Until’ marks the point at which the earlier action stopped."},
+  {id:"ep-p-12",section:"Cloze",weight:1,tags:["GRM"],prompt:"Fill the blank with one suitable word.",context:"Each of the boxes [[BLANK]] labelled before it was loaded onto the truck.",accepted:["was"],answer:"was",rule:"The head subject is singular ‘each’, not the nearby plural ‘boxes’."},
+  {id:"ep-p-13",section:"Cloze",weight:1,tags:["SEM","COL"],prompt:"Fill the blank with one suitable word.",context:"The coach reminded the team that one careless decision could [[BLANK]] the outcome of the entire match.",accepted:["affect","change","alter"],answer:"affect",rule:"Choose a verb meaning ‘influence’; do not confuse affect (verb) with effect (usually noun)."},
+  {id:"ep-p-14",section:"Cloze",weight:1,tags:["PREP","COL"],prompt:"Fill the blank with one suitable word.",context:"The twins were so similar that strangers often mistook one [[BLANK]] the other.",accepted:["for"],answer:"for",rule:"The fixed phrase is ‘mistake A for B’."},
+  {id:"ep-p-15",section:"Cloze",weight:1,tags:["GRM","SEM"],prompt:"Fill the blank with one suitable word.",context:"By the time the ambulance arrived, the injured cyclist [[BLANK]] already been moved to safety.",accepted:["had"],answer:"had",rule:"Use past perfect for the action completed before another past event."},
+  {id:"ep-p-16",section:"S&T",weight:2,tags:["SYN"],prompt:"Begin with ‘Unless’. Do not change the meaning.",context:"You must leave now, or you will miss the last bus.",accepted:["unless you leave now you will miss the last bus"],answer:"Unless you leave now, you will miss the last bus.",rule:"‘Unless’ already means ‘if not’; do not add another negative."},
+  {id:"ep-p-17",section:"S&T",weight:2,tags:["SYN","GRM"],prompt:"Begin with ‘Despite’. Do not change the meaning.",context:"Although Lena was exhausted, she completed the final lap.",accepted:["despite being exhausted lena completed the final lap","despite her exhaustion lena completed the final lap"],answer:"Despite being exhausted, Lena completed the final lap.",rule:"After ‘despite’, use a noun phrase or -ing construction."},
+  {id:"ep-p-18",section:"S&T",weight:2,tags:["SYN"],prompt:"Rewrite using ‘too’. Do not change the meaning.",context:"The bag was so heavy that Mei could not lift it.",accepted:["the bag was too heavy for mei to lift"],answer:"The bag was too heavy for Mei to lift.",rule:"When the doer changes, use ‘too + adjective + for + person + to-infinitive’."},
+  {id:"ep-p-19",section:"S&T",weight:2,tags:["SYN","TENSE"],prompt:"Begin with ‘It was only’. Do not change the meaning.",context:"Ali noticed the warning sign only after he had crossed the bridge.",accepted:["it was only after ali had crossed the bridge that he noticed the warning sign"],answer:"It was only after Ali had crossed the bridge that he noticed the warning sign.",rule:"Keep the earlier event in past perfect when the sequence matters."},
+  {id:"ep-p-20",section:"S&T",weight:2,tags:["SYN","TENSE","REF"],prompt:"Begin with ‘Mira told Ben that’. Do not change the meaning.",context:"Mira said to Ben, ‘I will bring your book tomorrow.’",accepted:["mira told ben that she would bring his book the following day","mira told ben that she would bring his book the next day"],answer:"Mira told Ben that she would bring his book the following day.",rule:"Check pronoun, tense and time-word changes one by one."},
+  {id:"ep-p-21",section:"S&T",weight:2,tags:["SYN","TENSE"],prompt:"Rewrite in the passive voice. Do not change the meaning.",context:"The mechanic repaired the bicycle yesterday.",accepted:["the bicycle was repaired by the mechanic yesterday"],answer:"The bicycle was repaired by the mechanic yesterday.",rule:"Keep the original tense when changing active to passive."},
+  {id:"ep-p-22",section:"S&T",weight:2,tags:["SYN","TENSE"],prompt:"Begin with ‘After’. Do not change the meaning.",context:"Kai finished his homework. Then he went downstairs for dinner.",accepted:["after kai had finished his homework he went downstairs for dinner","after finishing his homework kai went downstairs for dinner"],answer:"After Kai had finished his homework, he went downstairs for dinner.",rule:"Make the sequence unmistakable; past perfect can mark the earlier completed action."},
+  {id:"ep-p-23",section:"S&T",weight:2,tags:["SYN"],prompt:"Begin with ‘No other’. Do not change the meaning.",context:"Ethan is the tallest boy in his class.",accepted:["no other boy in ethan's class is as tall as he is","no other boy in ethans class is as tall as he is","no other boy in ethan's class is as tall as ethan","no other boy in ethans class is as tall as ethan"],answer:"No other boy in Ethan’s class is as tall as he is.",rule:"A superlative can be transformed into ‘No other … as … as …’ without changing the comparison group."},
+  {id:"ep-p-24",section:"S&T",weight:2,tags:["SYN","GRM"],prompt:"Begin with ‘It was such’. Do not change the meaning.",context:"The book was so interesting that Hana finished it in one evening.",accepted:["it was such an interesting book that hana finished it in one evening"],answer:"It was such an interesting book that Hana finished it in one evening.",rule:"Transform ‘so + adjective’ into ‘such + a/an + adjective + noun’ while preserving the result clause."},
+  {id:"ep-c20-01",section:"S&T",weight:2,tags:["TENSE","SYN"],prompt:"Begin with ‘Lina has’. Do not change the meaning.",context:"The last time Lina borrowed a book from this library was six weeks ago.",accepted:["lina has not borrowed a book from this library for six weeks"],answer:"Lina has not borrowed a book from this library for six weeks.",rule:"‘The last time … was six weeks ago’ becomes present perfect negative + ‘for’: has not … for six weeks."},
+  {id:"ep-c20-02",section:"S&T",weight:2,tags:["TENSE","SYN"],prompt:"Begin with ‘Mr Tan has’. Do not change the meaning.",context:"The last time Mr Tan drove this car was in May.",accepted:["mr tan has not driven this car since may"],answer:"Mr Tan has not driven this car since May.",rule:"Use present perfect negative with ‘since’ when the starting point is named: has not driven … since May."},
+  {id:"ep-c20-03",section:"S&T",weight:2,tags:["EXE","SYN"],prompt:"Rewrite using the word ‘too’. Do not change the meaning. Keep every person, object and place unchanged.",context:"The blue folder was placed so high on the shelf that Priya could not reach it.",accepted:["the blue folder was placed too high on the shelf for priya to reach","the blue folder was placed too high on the shelf for priya to reach it"],answer:"The blue folder was placed too high on the shelf for Priya to reach.",rule:"After transforming the grammar, compare the content nouns with the original: blue folder, shelf, Priya. Structure and story must both survive."}
+];
+
+const VOCAB_SWEEP_01_IDS=["v20d-01","v20d-02","v20d-03","v20d-04","v20d-05","v20d-06","v20d-07","v20d-08"];
+const EP_VOCAB_BANK=[
+  {id:"v20d-01",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"Although the sky had cleared, Maya was **reluctant** to leave the shelter because thunder could still be heard in the distance.",options:["eager to leave","hesitant or unwilling to leave","unable to leave","annoyed about leaving"],correctIndex:1,answer:"hesitant or unwilling to leave",rule:"Reluctant means unwilling or hesitant, even when the action is possible."},
+  {id:"v20d-02",tag:"FIT",prompt:"Choose the word that fits the sentence most precisely.",context:"The glass model was extremely _____; even a slight knock could crack it.",options:["flexible","rough","fragile","solid"],correctIndex:2,answer:"fragile",rule:"Fragile means easily broken or damaged. The clue is that even a slight knock could crack it."},
+  {id:"v20d-03",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"When the rain stopped, the crowd **dispersed** and the entrance became quiet again.",options:["moved away in different directions","gathered closely","shouted loudly","waited patiently"],correctIndex:0,answer:"moved away in different directions",rule:"Dispersed means spread out or moved away from one place."},
+  {id:"v20d-04",tag:"NUANCE",prompt:"Choose the verb that fits the action most precisely.",context:"Unable to read the faded number from a distance, Jia _____ through the narrow gap in the gate.",options:["glanced","admired","noticed","peered"],correctIndex:3,answer:"peered",rule:"To peer is to look closely or with difficulty. The context gives both clues."},
+  {id:"v20d-05",tag:"MORPH",prompt:"What does the highlighted word mean in this context?",context:"The guide's knowledge of the mountain paths proved **invaluable** when the main route was blocked.",options:["worthless","very expensive","extremely useful","impossible to measure"],correctIndex:2,answer:"extremely useful",rule:"Invaluable means extremely valuable or useful. The prefix in- does not mean 'not' in this word."},
+  {id:"v20d-06",tag:"FIT",prompt:"Choose the word that best completes the sentence.",context:"The technician was _____ when recording the measurements, checking every figure twice before submitting the report.",options:["meticulous","restless","casual","reckless"],correctIndex:0,answer:"meticulous",rule:"Meticulous means extremely careful and precise about details."},
+  {id:"v20d-07",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"After weeks without rain, clean water became **scarce** in the village.",options:["unsafe to drink","expensive to transport","easy to waste","difficult to obtain because little was available"],correctIndex:3,answer:"difficult to obtain because little was available",rule:"Scarce means in short supply or not available in sufficient quantity."},
+  {id:"v20d-08",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"Thick smoke **obscured** the exit sign, so the firefighters could barely see it.",options:["brightened","hid from view","damaged permanently","moved aside"],correctIndex:1,answer:"hid from view",rule:"Obscured means made difficult or impossible to see."},
+  {id:"v20d-09",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"The meeting came to an **abrupt** end when the fire alarm sounded.",options:["planned","sudden","peaceful","delayed"],correctIndex:1,answer:"sudden",rule:"Abrupt means sudden and unexpected."},
+  {id:"v20d-10",tag:"FIT",prompt:"Choose the word that fits the sentence most precisely.",context:"During the dry season, residents were asked to _____ water by taking shorter showers.",options:["conserve","collect","replace","produce"],correctIndex:0,answer:"conserve",rule:"Conserve means use carefully so that less is wasted."},
+  {id:"v20d-11",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"The players looked **dejected** after losing the final by one point.",options:["confused","sad and disappointed","angry and violent","tired but satisfied"],correctIndex:1,answer:"sad and disappointed",rule:"Dejected describes someone who feels low in spirits, especially after disappointment."},
+  {id:"v20d-12",tag:"NUANCE",prompt:"Choose the word that best describes the attitude.",context:"Whether the class won or lost the contest seemed to make no difference to Leon. He was completely _____.",options:["indifferent","impatient","relieved","curious"],correctIndex:0,answer:"indifferent",rule:"Indifferent means having no particular interest, concern or preference."},
+  {id:"v20d-13",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"The condition of the unused playground **deteriorated** after months of neglect.",options:["became worse","improved slowly","remained unchanged","became crowded"],correctIndex:0,answer:"became worse",rule:"Deteriorated means became progressively worse."},
+  {id:"v20d-14",tag:"FIT",prompt:"Choose the word that best completes the sentence.",context:"We had _____ time to reach the station, so there was no need to rush.",options:["ample","scarce","brief","urgent"],correctIndex:0,answer:"ample",rule:"Ample means more than enough for what is needed."},
+  {id:"v20d-15",tag:"NUANCE",prompt:"Choose the verb that fits the action most precisely.",context:"Before signing the contract, Mrs Lim _____ every line for hidden charges.",options:["scrutinised","glimpsed","wandered","ignored"],correctIndex:0,answer:"scrutinised",rule:"Scrutinise means examine something very carefully and closely."},
+  {id:"v20d-16",tag:"CTX",prompt:"What does the highlighted word mean in this context?",context:"His explanation sounded **plausible**, but the investigator still wanted evidence.",options:["certainly true","apparently reasonable or believable","deliberately false","too complicated to understand"],correctIndex:1,answer:"apparently reasonable or believable",rule:"Plausible means seeming reasonable or likely, without necessarily being proven true."},
+  {id:"v20d-17",tag:"MORPH",prompt:"Choose the meaning of the highlighted word.",context:"Attendance at the safety briefing is **compulsory** for every participant.",options:["optional","required","recommended","rewarded"],correctIndex:1,answer:"required",rule:"Compulsory means required by a rule or authority."},
+  {id:"v20d-18",tag:"NUANCE",prompt:"What does the highlighted word suggest?",context:"The committee made a **tentative** plan to hold the event outdoors, depending on the weather.",options:["final and unchangeable","not yet definite or certain","secret from the public","unpopular with members"],correctIndex:1,answer:"not yet definite or certain",rule:"Tentative means provisional or not yet fully decided."}
+];
+
+const VOCAB_TIER2_SWEEP_01_IDS=["v20e-01","v20e-02","v20e-03","v20e-04","v20e-05","v20e-06","v20e-07","v20e-08"];
+const EP_VOCAB_TIER2_BANK=[
+  {id:"v20e-01",tag:"CONNOT",prompt:"Choose the word that describes Arun most precisely.",context:"Arun compares prices and avoids waste, but he willingly pays more for quality when it matters. He is careful with money without being mean about spending.",options:["frugal","stingy","miserly","extravagant"],correctIndex:0,answer:"frugal",rule:"Frugal is careful and economical with money without the negative suggestion of refusing necessary spending. Stingy and miserly are more negative."},
+  {id:"v20e-02",tag:"NUANCE",prompt:"Choose the verb that fits the action most precisely.",context:"The print on the label had faded. Nisha leaned closer, narrowed her eyes and _____ at the tiny numbers until she could make them out.",options:["scanned","stared","glanced","peered"],correctIndex:3,answer:"peered",rule:"Peer means look closely or with difficulty, especially when something is hard to see. The physical clues make it more exact than stare, scan or glance."},
+  {id:"v20e-03",tag:"COLLOC",prompt:"Choose the word that completes the fixed expression.",context:"The inconsistency in the timestamps _____ doubt on the witness's account.",options:["raised","cast","caused","aroused"],correctIndex:1,answer:"cast",rule:"The fixed expression is ‘cast doubt on’. Other verbs can combine with doubt in different frames, but ‘on’ locks this phrase."},
+  {id:"v20e-04",tag:"MORPH",prompt:"Choose the correct word form.",context:"Because the witness's detailed account matched the camera footage, the jury had little reason to question her _____.",options:["credible","credulous","credibility","credibly"],correctIndex:2,answer:"credibility",rule:"After ‘her’ the sentence needs a noun. Credibility means the quality of being believable; credible is an adjective and credulous describes someone too ready to believe others."},
+  {id:"v20e-05",tag:"INFER",prompt:"What does **sceptical** mean here?",context:"Joel apologised and promised that the problem would not happen again. The next day he repeated exactly the same behaviour, so Mei remained **sceptical** about his promise.",options:["not fully convinced","deeply offended","secretly pleased","unable to remember"],correctIndex:0,answer:"not fully convinced",rule:"The second sentence supplies the inference: repeated behaviour gives Mei reason to doubt the promise rather than accept it at face value."},
+  {id:"v20e-06",tag:"NUANCE",prompt:"Choose the adjective that fits the pattern most precisely.",context:"The rain was never heavy, but it continued steadily for most of the afternoon with hardly a break.",options:["erratic","torrential","intermittent","persistent"],correctIndex:3,answer:"persistent",rule:"Persistent means continuing for a long time or refusing to stop. Torrential means very heavy; intermittent means stopping and starting; erratic means irregular."},
+  {id:"v20e-07",tag:"COLLOC",prompt:"Choose the verb that completes the phrase most naturally.",context:"If the damaged railing is not repaired, it could _____ a serious threat to younger children using the stairs.",options:["make","pose","give","set"],correctIndex:1,answer:"pose",rule:"The standard collocation is ‘pose a threat/risk/danger’. The surrounding grammar makes the phrase the target, not just general meaning."},
+  {id:"v20e-08",tag:"CONNOT",prompt:"Choose the word that best describes the report.",context:"The report covered every necessary point in just two pages and avoided repetition or unnecessary detail. It was _____.",options:["curt","vague","concise","superficial"],correctIndex:2,answer:"concise",rule:"Concise is brief while still complete. Curt suggests abruptness, vague lacks clarity, and superficial lacks depth."},
+  {id:"v20e-09",tag:"INFER",prompt:"What does **desolate** suggest in this passage?",context:"Years ago, buses stopped outside the row of shops every few minutes. After the bypass opened, the traffic vanished, most shutters stayed down and weeds grew through the pavement. The area became **desolate**.",options:["dangerously overcrowded","empty and abandoned-looking","newly modernised","difficult to reach because it was steep"],correctIndex:1,answer:"empty and abandoned-looking",rule:"The meaning comes from the accumulated clues: vanished traffic, closed shops and weeds. Desolate here means deserted and bleak."},
+  {id:"v20e-10",tag:"MORPH",prompt:"Choose the correct word form.",context:"The counsellor handled the student's private complaint with tact and complete _____.",options:["discreet","discrete","discretion","discreetly"],correctIndex:2,answer:"discretion",rule:"The phrase needs a noun after ‘complete’. Discretion is careful judgement and respect for privacy; discreet is the adjective, while discrete means separate or distinct."},
+  {id:"v20e-11",tag:"NUANCE",prompt:"Choose the verb that best matches the purpose of the reading.",context:"Ravi did not read every line of the timetable. He _____ the page quickly for the 6:45 departure time.",options:["skimmed","scanned","scrutinised","peered at"],correctIndex:1,answer:"scanned",rule:"Scan means search quickly for a specific piece of information. Skim means read quickly for the general idea; scrutinise is careful examination."},
+  {id:"v20e-12",tag:"COLLOC",prompt:"Choose the verb that fits the preposition and meaning.",context:"All laboratory users must _____ to the safety rules, even when an instructor is not present.",options:["adhere","comply","obey","conform"],correctIndex:0,answer:"adhere",rule:"The fixed pattern is ‘adhere to’. Comply takes ‘with’; obey takes a direct object; conform usually takes ‘to’ but means match a standard rather than simply follow a rule here."},
+  {id:"v20e-13",tag:"CONNOT",prompt:"Choose the adjective that best describes Priya's manner.",context:"Priya stated her disagreement clearly and firmly, but she did not insult anyone or raise her voice. She was _____.",options:["assertive","aggressive","arrogant","stubborn"],correctIndex:0,answer:"assertive",rule:"Assertive means confident and direct without being hostile. Aggressive and arrogant add negative behaviour not supported by the context."},
+  {id:"v20e-14",tag:"INFER",prompt:"What does **evasive** mean in this context?",context:"When asked whether the money had been returned, the manager spoke at length about unrelated procedures and never answered yes or no. Her reply was **evasive**.",options:["highly persuasive","factually detailed","open and honest","designed to avoid a direct answer"],correctIndex:3,answer:"designed to avoid a direct answer",rule:"The clue is not that the reply was long, but that it deliberately avoided the question. Evasive means avoiding a direct response or commitment."},
+  {id:"v20e-15",tag:"NUANCE",prompt:"Choose the verb that best captures how Daniel spoke.",context:"Daniel was annoyed and spoke in a low, indistinct voice that the others could barely hear. He _____ his reply.",options:["whispered","announced","muttered","murmured"],correctIndex:2,answer:"muttered",rule:"Mutter usually describes low, indistinct speech, often linked with annoyance. Whisper is deliberately quiet; murmur is softer and does not carry the same irritation clue."},
+  {id:"v20e-16",tag:"COLLOC",prompt:"Choose the verb that completes the expression.",context:"Several parents _____ issue with the claim that the new rule had been explained clearly.",options:["took","made","raised","gave"],correctIndex:0,answer:"took",rule:"The fixed expression is ‘take issue with’, meaning disagree with or object to something."},
+  {id:"v20e-17",tag:"MORPH",prompt:"Choose the correct word form.",context:"The final paragraph was so _____ that two readers interpreted it in completely different ways.",options:["ambiguity","ambiguous","ambiguously","ambivalence"],correctIndex:1,answer:"ambiguous",rule:"After ‘was so’ the sentence needs an adjective. Ambiguous means open to more than one interpretation."},
+  {id:"v20e-18",tag:"CONNOT",prompt:"Choose the adjective that best matches the tone of the review.",context:"The critic did not simply identify weaknesses. She mocked the author's ideas and described the book as a complete waste of time. The review was _____.",options:["constructive","scathing","cautious","balanced"],correctIndex:1,answer:"scathing",rule:"Scathing describes extremely harsh, cutting criticism. The mocking and contemptuous language goes beyond ordinary criticism."},
+  {id:"v20e-19",tag:"INFER",prompt:"What does **negligible** mean here?",context:"After the adjustment, fuel use fell by less than one tenth of one percent. The engineer said the difference was **negligible** and would not affect the decision.",options:["dangerously high","temporary but important","too small to matter","impossible to calculate"],correctIndex:2,answer:"too small to matter",rule:"The numerical clue and ‘would not affect the decision’ show that negligible means so small or unimportant that it can be disregarded."},
+  {id:"v20e-20",tag:"NUANCE",prompt:"Choose the word that best describes the approval.",context:"The committee allowed the trial to continue for one month, but said it would reconsider the decision after reviewing the new evidence. The approval was _____.",options:["reluctant","unanimous","provisional","permanent"],correctIndex:2,answer:"provisional",rule:"Provisional means temporary or conditional pending later confirmation. The one-month limit and planned review are the decisive clues."}
+];
+
+const ERROR_TYPES=["Didn't know it","Couldn't explain it fully","Misread","Wrong method","Careless","Guessed"];
+
+let state, tab="today", shown=false, storageWarning="", busy=false;
+let pendingClassify=null, reviewSuccess="";
+let epState, epError="";
+
+function esc(s){return String(s??"").replace(/[&<>\"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;"}[c]));}
+
+function epNorm(s){
+  return String(s??"").toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z0-9' ]+/g," ").replace(/\s+/g," ").trim();
+}
+function epCorrect(q,answer){
+  const a=epNorm(answer);
+  return !!a && (q.accepted||[]).some(x=>epNorm(x)===a);
+}
+function ep20bFieldReview(s){
+  if(!s||!s.diagnostic||!s.diagnostic.responses)return s;
+  if(s.diagnostic.review20b)return s;
+  const r=s.diagnostic.responses,items={};
+  const q8=epNorm(r["ep-d-08"]?.finalAnswer),q9=epNorm(r["ep-d-09"]?.finalAnswer);
+  const q14=epNorm(r["ep-d-14"]?.finalAnswer),q15=epNorm(r["ep-d-15"]?.finalAnswer);
+  if(q8==="reasons")items["ep-d-08"]={status:"accepted_variant",excludeFromProfile:true,note:"‘reasons’ is a legitimate open-cloze answer; this item is excluded from adaptive weighting because the prompt is not sufficiently discriminating."};
+  if(q9==="explain")items["ep-d-09"]={status:"ambiguous_item",excludeFromProfile:true,note:"‘explain the rule’ is defensible English; this item is excluded from adaptive weighting."};
+  if(q14 && !q14.startsWith("grace told tom that") && q14.includes("she would return his notes") && (q14.includes("next day")||q14.includes("following day")))items["ep-d-14"]={status:"execution",profileTags:["EXE"],note:"Reported-speech shifts were correct; the required starter word ‘that’ was omitted."};
+  if(q15 && q15.startsWith("it was only when") && q15.includes("had left his keys at home"))items["ep-d-15"]={status:"typo",excludeFromProfile:true,note:"Field review confirmed a typing slip; underlying It was only … that … / past-perfect structure was understood."};
+  s.diagnostic.review20b={appliedAt:Date.now(),source:"human-reviewed field test",items};
+  // Human-reviewed training weights. Raw diagnostic responses and raw score remain untouched.
+  s.profile={updatedAt:Date.now(),reviewVersion:"20b",reviewSource:"human-reviewed field test",weakTags:[
+    {tag:"SEM",score:18},{tag:"COL",score:13},{tag:"TENSE",score:10},{tag:"SYN",score:9},{tag:"EXE",score:7}
+  ]};
+  return s;
+}
+function ep20cSprintReview(s){
+  if(!s||!Array.isArray(s.drillHistory)||!s.drillHistory.length)return s;
+  const sprint=s.drillHistory.find(x=>Array.isArray(x.questionIds)&&EP_SPRINT_01_IDS.every(id=>x.questionIds.includes(id)));
+  if(!sprint)return s;
+  if(sprint.review20c){
+    if(!Array.isArray(sprint.reviewedMissTags))sprint.reviewedMissTags=["TENSE","SYN","EXE"];
+    if(s.profile?.reviewVersion!=="20c")s.profile={updatedAt:sprint.review20c.appliedAt||Date.now(),reviewVersion:"20c",reviewSource:"Sprint 01 human review",weakTags:[
+      {tag:"TENSE",score:18},{tag:"EXE",score:14},{tag:"SEM",score:7},{tag:"COL",score:6},{tag:"SYN",score:4}
+    ]};
+    return s;
+  }
+  const items={
+    "ep-b20-01":{status:"setter_defect",excludeFromProfile:true,note:"‘assurance’ is defensible in context and the original whitelist also contained an ill-fitting ‘guarantee’. Retired from future selection."},
+    "ep-b20-02":{status:"mastered",masteredTags:["COL","SEM"],note:"‘draw a conclusion’ was correct at confidence 3."},
+    "ep-b20-03":{status:"mastered",masteredTags:["SEM"],note:"‘protect’ correctly tracked the purpose across the passage."},
+    "ep-b20-04":{status:"rule_gap",profileTags:["TENSE","SYN"],note:"Repeated the diagnostic pattern: present perfect paired with ‘ago’. Train negative present perfect + for/since."},
+    "ep-b20-05":{status:"execution",profileTags:["EXE"],masteredTags:["SYN"],note:"The too…to structure was correct; changing ‘doorway’ to ‘window’ was a meaning-preservation leak."},
+    "ep-b20-06":{status:"mastered",masteredTags:["EXE","TENSE","REF"],note:"Starter compliance, pronouns, tense and time-word shifts were all correct."}
+  };
+  sprint.review20c={appliedAt:Date.now(),source:"Sprint 01 human review",rawScore:sprint.score,rawMax:sprint.max,items};
+  sprint.reviewedMissTags=["TENSE","SYN","EXE"];
+  s.profile={updatedAt:Date.now(),reviewVersion:"20c",reviewSource:"Sprint 01 human review",weakTags:[
+    {tag:"TENSE",score:18},{tag:"EXE",score:14},{tag:"SEM",score:7},{tag:"COL",score:6},{tag:"SYN",score:4}
+  ]};
+  return s;
+}
+function ep20dSprintReview(s){
+  if(!s||!Array.isArray(s.drillHistory)||s.drillHistory.length<2)return s;
+  const sprint=s.drillHistory.find(x=>Array.isArray(x.questionIds)&&EP_SPRINT_02_IDS.every(id=>x.questionIds.includes(id)));
+  if(!sprint)return s;
+  const reviewedProfile=()=>({updatedAt:sprint.review20d?.appliedAt||Date.now(),reviewVersion:"20d",reviewSource:"Sprint 02 human review",weakTags:[
+    {tag:"TENSE",score:15},{tag:"EXE",score:14},{tag:"COL",score:10},{tag:"SEM",score:5},{tag:"SYN",score:3}
+  ]});
+  if(sprint.review20d){
+    if(!Array.isArray(sprint.reviewedMissTags))sprint.reviewedMissTags=["TENSE","EXE","COL"];
+    if(s.profile?.reviewVersion!=="20d")s.profile=reviewedProfile();
+    return s;
+  }
+  const items={
+    "ep-p-09":{status:"rule_gap",profileTags:["COL"],note:"The fixed phrase is ‘take something into account’. Reinforce the phrase as one lexical unit."},
+    "ep-c20-01":{status:"partial_acquisition",profileTags:["TENSE"],masteredTags:["SYN"],note:"Negative present-perfect architecture is now present. The remaining gap is FOR = duration versus SINCE = starting point."},
+    "ep-p-07":{status:"setter_defect",excludeFromProfile:true,note:"‘Although’ is defensible English in the original frame. Item retired; no learner weakness inferred."},
+    "ep-c20-02":{status:"mastered",masteredTags:["TENSE","SYN"],note:"Correctly used negative present perfect with ‘since May’."},
+    "ep-p-13":{status:"mastered",masteredTags:["SEM","COL"],note:"‘change the outcome’ is a correct contextual and lexical fit."},
+    "ep-c20-03":{status:"execution",profileTags:["EXE"],masteredTags:["SYN"],note:"The too…to structure was correct; dropping ‘blue’ changed the payload. Train noun + modifier preservation."}
+  };
+  sprint.review20d={appliedAt:Date.now(),source:"Sprint 02 human review",rawScore:sprint.score,rawMax:sprint.max,items};
+  sprint.reviewedMissTags=["TENSE","EXE","COL"];
+  s.profile=reviewedProfile();
+  return s;
+}
+function ep20eSprintReview(s){
+  if(!s||!Array.isArray(s.drillHistory)||s.drillHistory.length<3)return s;
+  const sprint=s.drillHistory.find(x=>Array.isArray(x.questionIds)&&x.questionIds.includes("ep-p-21")&&x.responses?.["ep-p-21"]?.answer&&epNorm(x.responses["ep-p-21"].answer).includes("previous day"));
+  if(!sprint)return s;
+  const reviewedProfile=()=>({updatedAt:sprint.review20e?.appliedAt||Date.now(),reviewVersion:"20e",reviewSource:"Sprint 03 human review",weakTags:[
+    {tag:"EXE",score:15},{tag:"TRF",score:12},{tag:"TENSE",score:6},{tag:"COL",score:4},{tag:"SEM",score:3},{tag:"SYN",score:2}
+  ]});
+  if(sprint.review20e){
+    if(!Array.isArray(sprint.reviewedMissTags))sprint.reviewedMissTags=["EXE","TRF"];
+    if(s.profile?.reviewVersion!=="20e")s.profile=reviewedProfile();
+    return s;
+  }
+  const items={
+    "ep-p-03":{status:"mastered",masteredTags:["PREP","COL"],note:"Correctly used ‘divided into’."},
+    "ep-p-22":{status:"mastered",masteredTags:["SYN","TENSE"],note:"After-transformation preserved the event sequence correctly."},
+    "ep-p-01":{status:"mastered",masteredTags:["COL","SEM"],note:"Correctly supplied ‘attention’ in the fixed collocation."},
+    "ep-p-20":{status:"mastered",masteredTags:["SYN","TENSE","REF"],note:"Reported-speech pronoun, tense and time-word shifts were all correct."},
+    "ep-p-08":{status:"mastered",masteredTags:["COL"],note:"Correctly used ‘effect’ in ‘have little effect on’."},
+    "ep-p-21":{status:"over_transfer",profileTags:["EXE","TRF"],masteredTags:["SYN","TENSE"],note:"Passive structure and tense were correct. Changing ‘yesterday’ to ‘the previous day’ imported a reported-speech rule that was not required. Train: change only what the instruction asks; preserve all other payload."}
+  };
+  sprint.review20e={appliedAt:Date.now(),source:"Sprint 03 human review",rawScore:sprint.score,rawMax:sprint.max,items};
+  sprint.reviewedMissTags=["EXE","TRF"];
+  s.profile=reviewedProfile();
+  return s;
+}
+function newEnglishState(){return {version:ENGLISH_RELEASE,diagnostic:null,profile:null,active:null,drillHistory:[],vocabHistory:[],vocabProfile:null};}
+function normalizeEnglishState(x){
+  const s=(x&&typeof x==="object")?clone(x):newEnglishState();
+  s.version=ENGLISH_RELEASE;
+  if(!Array.isArray(s.drillHistory))s.drillHistory=[];
+  if(!Array.isArray(s.vocabHistory))s.vocabHistory=[];
+  s.vocabHistory.forEach(h=>{if(!h.tier)h.tier=1;});
+  if(!s.vocabProfile||typeof s.vocabProfile!=="object")s.vocabProfile=null;
+  if(!s.active||typeof s.active!=="object")s.active=null;
+  if(!s.profile||typeof s.profile!=="object")s.profile=null;
+  if(!s.diagnostic||typeof s.diagnostic!=="object")s.diagnostic=null;
+  return ep20eSprintReview(ep20dSprintReview(ep20cSprintReview(ep20bFieldReview(s))));
+}
+function loadEnglishPrecision(){
+  epState=newEnglishState();
+  const raw=readLocal(ENGLISH_STATE_KEY);
+  if(raw){try{epState=normalizeEnglishState(JSON.parse(raw));}catch(e){epError="English Precision found saved data it could not read. Your main Beacon cards are unaffected.";}}
+  persistEnglishPrecision(false);
+}
+function persistEnglishPrecision(markChange=true){
+  try{localStorage.setItem(ENGLISH_STATE_KEY,JSON.stringify(epState));if(markChange)writeLocal("beacon-last-change",String(Date.now()));return true;}
+  catch(e){epError="English Precision could not save this step. Back up Beacon before closing.";return false;}
+}
+function epTagLabel(t){return EP_TAG_LABELS[t]||t;}
+function epReviewedTargetLabel(t){
+  const labels={SEM:"Contextual precision",COL:"Fixed phrases / collocation",TENSE:"For vs since / present-perfect time",SYN:"S&T structure reinforcement",EXE:"Meaning preservation / final verification",TRF:"Rule transfer / change only what is asked"};
+  return labels[t]||epTagLabel(t);
+}
+function vocabTagLabel(t){return VOCAB_TAG_LABELS[t]||t;}
+function vocabQuestionById(id){return EP_VOCAB_BANK.concat(EP_VOCAB_TIER2_BANK).find(q=>q.id===id);}
+function vocabTier2Unlocked(){
+  const tier1=(epState.vocabHistory||[]).filter(h=>(h.tier||1)===1);
+  const lastTwo=tier1.slice(-2);
+  return lastTwo.length===2&&lastTwo.every(h=>Number(h.score)===Number(h.max));
+}
+function vocabCorrect(q,choice){return Number(choice)===Number(q.correctIndex);}
+function vocabContextHtml(q){return esc(q.context||"").replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');}
+function vocabOptionsHtml(q,selected,disabled=false){
+  const letters=["A","B","C","D"];
+  return '<div class="vocab-options">'+q.options.map((opt,i)=>'<button '+(disabled?'disabled ':'')+'data-vocab-choice="'+i+'" class="'+((selected!==null&&selected!==undefined&&Number(selected)===i)?'on':'')+'"><span class="vocab-letter">'+letters[i]+'</span><span>'+esc(opt)+'</span></button>').join('')+'</div>';
+}
+function epQuestionById(id){return EP_DIAGNOSTIC.concat(EP_DRILL_BANK).find(q=>q.id===id);}
+function epContextHtml(q){return esc(q.context||"").replace(/\[\[BLANK\]\]/g,'<span class="ep-blank">_____</span>').replace(/\n/g,"<br>");}
+function epConfidenceHtml(selected,disabled=false){
+  const labels={1:"1 · Unsure",2:"2 · Think so",3:"3 · Certain"};
+  return '<div class="confidence">'+[1,2,3].map(n=>'<button '+(disabled?'disabled ':'')+'data-ep-confidence="'+n+'" class="'+(Number(selected)===n?'on':'')+'">'+labels[n]+'</button>').join("")+'</div>';
+}
+function epInputHtml(q,value){
+  const v=esc(value||"");
+  return q.section==="Cloze"?'<input id="ep-answer" autocomplete="off" autocapitalize="none" placeholder="One suitable word" value="'+v+'">':'<textarea id="ep-answer" rows="4" placeholder="Write the complete transformed sentence">'+v+'</textarea>';
+}
+function epSetConfidence(n){
+  if(!epState.active)return;
+  epState.active.confidence=Number(n);epError="";persistEnglishPrecision(false);
+  document.querySelectorAll('[data-ep-confidence]').forEach(b=>b.classList.toggle("on",Number(b.dataset.epConfidence)===Number(n)));
+}
+function startEnglishDiagnostic(){
+  epState.active={kind:"diagnostic",phase:"first",index:0,responses:{},confidence:0,itemStartedAt:Date.now(),startedAt:Date.now()};
+  epState.diagnostic=null;epState.profile=null;epError="";persistEnglishPrecision();render();
+}
+function resumeOrStartDiagnostic(){if(epState.active&&epState.active.kind==="diagnostic")return render();startEnglishDiagnostic();}
+function epSaveDiagnosticStep(){
+  const a=epState.active;if(!a||a.kind!=="diagnostic")return;
+  const q=EP_DIAGNOSTIC[a.index],answer=(document.getElementById("ep-answer")?.value||"").trim();
+  if(!answer){epError="Enter an answer before continuing.";render();return;}
+  if(a.phase==="first"&&!a.confidence){epError="Choose how confident you are before continuing.";render();return;}
+  const r=a.responses[q.id]||{};
+  if(a.phase==="first"){
+    r.firstAnswer=answer;r.finalAnswer=answer;r.confidence=Number(a.confidence);r.firstMs=Math.max(0,Date.now()-(a.itemStartedAt||Date.now()));
+  }else{
+    r.finalAnswer=answer;r.reviewMs=Math.max(0,Date.now()-(a.itemStartedAt||Date.now()));
+  }
+  a.responses[q.id]=r;epError="";
+  if(a.index<EP_DIAGNOSTIC.length-1){a.index++;a.confidence=0;a.itemStartedAt=Date.now();persistEnglishPrecision();render();return;}
+  if(a.phase==="first"){
+    a.phase="review";a.index=0;a.confidence=0;a.itemStartedAt=Date.now();persistEnglishPrecision();render();return;
+  }
+  completeEnglishDiagnostic();
+}
+function epDiagnosticSummary(responses){
+  let first=0,final=0,max=0,catches=0,over=0,high=0,stable=0;
+  const tagScore={};
+  EP_DIAGNOSTIC.forEach(q=>{
+    const r=responses[q.id]||{},fc=epCorrect(q,r.firstAnswer),lc=epCorrect(q,r.finalAnswer),w=q.weight||1;
+    max+=w;if(fc)first+=w;if(lc)final+=w;
+    if(!fc&&lc)catches++;if(fc&&!lc)over++;if(fc&&lc)stable++;if(!fc&&Number(r.confidence)===3)high++;
+    if(!fc)q.tags.forEach(t=>tagScore[t]=(tagScore[t]||0)+(Number(r.confidence)===3?2:1));
+    if(!lc)q.tags.forEach(t=>tagScore[t]=(tagScore[t]||0)+2);
+    if(fc&&!lc)tagScore.OVR=(tagScore.OVR||0)+3;
+    if(!fc&&Number(r.confidence)===3)tagScore.INT=(tagScore.INT||0)+2;
+  });
+  const lost=Math.max(0,max-first),recovered=Math.max(0,final-first),avoid=lost?Math.round(recovered/lost*100):100;
+  const weakTags=Object.entries(tagScore).sort((a,b)=>b[1]-a[1]).map(([tag,score])=>({tag,score}));
+  return {firstScore:first,finalScore:final,maxScore:max,catches,overthinks:over,highConfidenceMisses:high,stable,avoidableMarksRecovered:recovered,avoidabilityRatio:avoid,weakTags};
+}
+function completeEnglishDiagnostic(){
+  const a=epState.active,summary=epDiagnosticSummary(a.responses);
+  epState.diagnostic={completedAt:Date.now(),startedAt:a.startedAt,responses:a.responses,summary};
+  epState.profile={updatedAt:Date.now(),weakTags:summary.weakTags};epState.active=null;epError="";persistEnglishPrecision();render();
+}
+function epRecentQuestionIds(){return new Set((epState.drillHistory||[]).slice(-2).flatMap(s=>s.questionIds||[]));}
+function epCurrentWeakTags(){
+  const scores={};
+  ((epState.profile&&epState.profile.weakTags)||[]).forEach(x=>scores[x.tag]=(scores[x.tag]||0)+Number(x.score||1));
+  (epState.drillHistory||[]).slice(-3).forEach(s=>((s.reviewedMissTags||s.missTags)||[]).forEach(t=>scores[t]=(scores[t]||0)+2));
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]).map(x=>x[0]);
+  return ranked.length?ranked:["COL","SYN","GRM","SEM"];
+}
+function choosePrecisionDrill(){
+  const history=epState.drillHistory||[];
+  if(history.length===0 && ["20b","20c","20d","20e"].includes(epState.profile?.reviewVersion))return EP_SPRINT_01_IDS.slice();
+  if(history.length===1 && history[0]?.review20c)return EP_SPRINT_02_IDS.slice();
+  const weak=epCurrentWeakTags(),recent=epRecentQuestionIds();
+  const tagWeight=t=>{const i=weak.indexOf(t);return i>=0?Math.max(1,6-i):0;};
+  const score=q=>q.tags.reduce((n,t)=>n+tagWeight(t),0)+(recent.has(q.id)?-8:0)+Math.random();
+  const ranked=EP_DRILL_BANK.filter(q=>!q.retired).sort((a,b)=>score(b)-score(a));
+  const cloze=ranked.filter(q=>q.section==="Cloze").slice(0,3);
+  const st=ranked.filter(q=>q.section==="S&T").slice(0,3);
+  const mixed=[];for(let i=0;i<3;i++){if(cloze[i])mixed.push(cloze[i]);if(st[i])mixed.push(st[i]);}
+  return mixed.map(q=>q.id);
+}
+function startPrecisionDrill(){
+  epState.active={kind:"drill",questionIds:choosePrecisionDrill(),index:0,responses:{},confidence:0,feedback:false,error:"",startedAt:Date.now()};
+  epError="";persistEnglishPrecision();render();
+}
+function epCheckDrill(){
+  const a=epState.active,q=epQuestionById(a.questionIds[a.index]);
+  const answer=(document.getElementById("ep-answer")?.value||"").trim();
+  if(!answer){a.error="Enter an answer first.";render();return;}
+  if(!a.confidence){a.error="Choose your confidence first.";render();return;}
+  a.responses[q.id]={answer,confidence:Number(a.confidence),correct:epCorrect(q,answer),answeredAt:Date.now()};a.feedback=true;a.error="";persistEnglishPrecision();render();
+}
+function epNextDrill(){
+  const a=epState.active;if(a.index<a.questionIds.length-1){a.index++;a.confidence=0;a.feedback=false;a.error="";persistEnglishPrecision();render();return;}completePrecisionDrill();
+}
+function completePrecisionDrill(){
+  const a=epState.active;let score=0,max=0;const missTags=[];
+  a.questionIds.forEach(id=>{const q=epQuestionById(id),r=a.responses[id]||{};max+=q.weight||1;if(r.correct)score+=q.weight||1;else missTags.push(...q.tags);});
+  epState.drillHistory.push({completedAt:Date.now(),score,max,questionIds:a.questionIds,responses:a.responses,missTags});
+  epState.drillHistory=epState.drillHistory.slice(-30);epState.active=null;epError="";persistEnglishPrecision();render();
+}
+function chooseVocabularySweep(){
+  const history=epState.vocabHistory||[],tier2=vocabTier2Unlocked();
+  if(tier2){
+    const h2=history.filter(h=>Number(h.tier)===2);
+    if(!h2.length)return {tier:2,questionIds:VOCAB_TIER2_SWEEP_01_IDS.slice()};
+    const recent=new Set(h2.slice(-2).flatMap(s=>s.questionIds||[]));
+    const weak=((epState.vocabProfile&&epState.vocabProfile.tier===2&&epState.vocabProfile.weakTags)||[]).map(x=>x.tag);
+    const weight=t=>{const i=weak.indexOf(t);return i>=0?Math.max(1,7-i):1;};
+    const ids=EP_VOCAB_TIER2_BANK.slice().sort((a,b)=>(weight(b.tag)+(recent.has(b.id)?-8:0)+Math.random())-(weight(a.tag)+(recent.has(a.id)?-8:0)+Math.random())).slice(0,8).map(q=>q.id);
+    return {tier:2,questionIds:ids};
+  }
+  if(!history.length)return {tier:1,questionIds:VOCAB_SWEEP_01_IDS.slice()};
+  const recent=new Set(history.slice(-2).flatMap(s=>s.questionIds||[]));
+  const weak=((epState.vocabProfile&&epState.vocabProfile.tier!==2&&epState.vocabProfile.weakTags)||[]).map(x=>x.tag);
+  const weight=t=>{const i=weak.indexOf(t);return i>=0?Math.max(1,6-i):1;};
+  const ids=EP_VOCAB_BANK.slice().sort((a,b)=>(weight(b.tag)+(recent.has(b.id)?-8:0)+Math.random())-(weight(a.tag)+(recent.has(a.id)?-8:0)+Math.random())).slice(0,8).map(q=>q.id);
+  return {tier:1,questionIds:ids};
+}
+function startVocabularySweep(){
+  const pick=chooseVocabularySweep();
+  epState.active={kind:"vocab",tier:pick.tier,questionIds:pick.questionIds,index:0,responses:{},confidence:0,choice:null,feedback:false,error:"",startedAt:Date.now()};
+  epError="";persistEnglishPrecision();render();
+}
+function vocabSetChoice(i){
+  const a=epState.active;if(!a||a.kind!=="vocab"||a.feedback)return;
+  a.choice=Number(i);a.error="";persistEnglishPrecision(false);
+  document.querySelectorAll('[data-vocab-choice]').forEach(b=>b.classList.toggle("on",Number(b.dataset.vocabChoice)===Number(i)));
+}
+function checkVocabulary(){
+  const a=epState.active,q=vocabQuestionById(a.questionIds[a.index]);
+  if(a.choice===null||a.choice===undefined){a.error="Choose one answer first.";render();return;}
+  if(!a.confidence){a.error="Choose your confidence first.";render();return;}
+  const choice=Number(a.choice);
+  a.responses[q.id]={choice,answer:q.options[choice],confidence:Number(a.confidence),correct:vocabCorrect(q,choice),answeredAt:Date.now()};
+  a.feedback=true;a.error="";persistEnglishPrecision();render();
+}
+function nextVocabulary(){
+  const a=epState.active;if(a.index<a.questionIds.length-1){a.index++;a.confidence=0;a.choice=null;a.feedback=false;a.error="";persistEnglishPrecision();render();return;}
+  completeVocabularySweep();
+}
+function completeVocabularySweep(){
+  const a=epState.active;let score=0;const missTags=[],tagScore={};
+  a.questionIds.forEach(id=>{const q=vocabQuestionById(id),r=a.responses[id]||{};if(r.correct)score++;else{missTags.push(q.tag);tagScore[q.tag]=(tagScore[q.tag]||0)+(Number(r.confidence)===3?2:1);}});
+  const weakTags=Object.entries(tagScore).sort((x,y)=>y[1]-x[1]).map(([tag,score])=>({tag,score}));
+  epState.vocabHistory.push({completedAt:Date.now(),tier:a.tier||1,score,max:a.questionIds.length,questionIds:a.questionIds,responses:a.responses,missTags});
+  epState.vocabHistory=epState.vocabHistory.slice(-30);
+  epState.vocabProfile={updatedAt:Date.now(),tier:a.tier||1,weakTags};
+  epState.active=null;epError="";persistEnglishPrecision();render();
+}
+function renderVocabularySweep(v){
+  const a=epState.active,q=vocabQuestionById(a.questionIds[a.index]),r=a.responses[q.id],feedback=a.feedback&&r;
+  const tier=a.tier||1,tier2=tier===2;
+  v.innerHTML='<div class="precision-hero"><h2>Vocabulary Precision · Tier '+tier+'</h2><p>'+(tier2?'Fine distinctions. Several answers may look possible; choose the one the whole context actually earns.':'Eight context-first questions. Choose the exact meaning or word, not the one that merely feels familiar.')+'</p><div class="precision-rule">'+(tier2?'Context → eliminate near-misses → connotation/collocation → commit.':'Context → exact meaning → nuance → commit.')+'</div></div>'+
+    '<div class="card"><div class="tag English">VOCABULARY TIER '+tier+' · '+(a.index+1)+' OF '+a.questionIds.length+'</div><div class="body"><div class="ep-review-note"><strong>BEACON CHECK:</strong> '+(tier2?'Do not ask which option can fit. Ask which option fits best and why the others lose.':'Read the whole sentence before choosing. Ask what every clue rules in or out.')+'</div><p class="q">'+esc(q.prompt)+'</p><div class="ep-context">'+vocabContextHtml(q)+'</div>'+
+    vocabOptionsHtml(q,feedback?r.choice:a.choice,feedback)+
+    '<label>CONFIDENCE</label>'+epConfidenceHtml(feedback?r.confidence:a.confidence,feedback)+
+    (a.error?'<div class="form-error">'+esc(a.error)+'</div>':'')+
+    (feedback?(r.correct?'<div class="ep-good"><strong>Verified.</strong><div>'+esc(q.answer)+'</div><div class="tiny">'+esc(q.rule)+'</div></div>':'<div class="ep-miss"><strong>Beacon caught it.</strong><div>'+esc(q.answer)+'</div><div class="tiny">'+esc(q.rule)+'</div></div>'):'')+
+    '<button class="big" id="vocab-action">'+(feedback?(a.index===a.questionIds.length-1?'Finish vocabulary sweep':'Next question'):'Check answer')+'</button></div></div>';
+  if(!feedback){v.querySelectorAll('[data-vocab-choice]').forEach(b=>b.onclick=()=>vocabSetChoice(b.dataset.vocabChoice));v.querySelectorAll('[data-ep-confidence]').forEach(b=>b.onclick=()=>epSetConfidence(b.dataset.epConfidence));}
+  document.getElementById("vocab-action").onclick=feedback?nextVocabulary:checkVocabulary;
+}
+function renderVocabularyLane(){
+  const history=epState.vocabHistory||[],unlocked=vocabTier2Unlocked(),h2=history.filter(h=>Number(h.tier)===2),last=unlocked?(h2.at(-1)||null):history.at(-1);
+  const weak=((epState.vocabProfile&&(!unlocked||epState.vocabProfile.tier===2)&&epState.vocabProfile.weakTags)||[]).slice(0,3);
+  const tier1=history.filter(h=>(h.tier||1)===1),lastTwo=tier1.slice(-2);
+  const unlockNote=unlocked&&lastTwo.length===2?'<div class="ep-review-note"><strong>Tier 2 unlocked:</strong> the last two Tier 1 sweeps were '+lastTwo.map(x=>x.score+'/'+x.max).join(' and ')+'. Tier 2 now tests near-synonyms, connotation, fixed phrases, word families and clues spread across more than one sentence.</div>':'';
+  const summary=last?'<div class="session-line"><span>Latest Vocabulary Tier '+(last.tier||1)+' Sweep</span><strong>'+last.score+'/'+last.max+'</strong></div>'+
+    (weak.length?'<div class="vocab-tags">'+weak.map(x=>'<span class="tagchip">'+esc(vocabTagLabel(x.tag))+'</span>').join('')+'</div>':'<div class="tiny">No weakness category dominated the latest Tier '+(last.tier||1)+' sweep.</div>'):
+    (unlocked?'<div class="tiny">Tier 2 has not been attempted yet.</div>':'');
+  return '<div class="vocab-lane"><h3>Vocabulary Precision'+(unlocked?' · Tier 2':'')+'</h3>'+unlockNote+summary+'<button class="big" id="vocab-start">'+(unlocked?(h2.length?'Start another Tier 2 Vocabulary Sweep':'Start Tier 2 Vocabulary Sweep 01'):(last?'Start another Vocabulary Sweep':'Start 8-question Vocabulary Sweep 01'))+'</button><div class="tiny">'+(unlocked?'Near-synonyms · connotation · fixed phrases · multi-sentence inference · word-family precision.':'Meaning in context · exact lexical fit · near-synonym precision · word meaning.')+'</div></div>';
+}
+function renderEnglish(v){
+  if(!epState)loadEnglishPrecision();
+  if(epState.active?.kind==="diagnostic")return renderEnglishDiagnostic(v);
+  if(epState.active?.kind==="drill")return renderPrecisionDrill(v);
+  if(epState.active?.kind==="vocab")return renderVocabularySweep(v);
+  const d=epState.diagnostic;
+  if(!d){
+    v.innerHTML='<div class="precision-hero"><h2>English Precision</h2><p>Protect the marks your English already deserves. This module trains verification, not basic fluency.</p><div class="precision-rule">Fluent is not the same as verified.</div></div>'+ 
+      '<div class="card"><div class="tag English">BEACON 01 · DIAGNOSTIC BASELINE</div><div class="body"><p class="q">15 questions · Cloze + Synthesis & Transformation</p><p class="commit">Cold first pass → confidence capture → neutral review pass → Precision Profile. No hints and no answer reveal until submission.</p><button class="big" id="ep-start">Start diagnostic</button></div></div>';
+    document.getElementById("ep-start").onclick=startEnglishDiagnostic;return;
+  }
+  return renderEnglishProfile(v);
+}
+function renderEnglishDiagnostic(v){
+  const a=epState.active,q=EP_DIAGNOSTIC[a.index],r=a.responses[q.id]||{};
+  const review=a.phase==="review",value=review?(r.finalAnswer||r.firstAnswer||""):"";
+  v.innerHTML='<div class="precision-hero"><h2>Beacon 01</h2><p>'+ (review?'Neutral review pass. Change an answer only if you can justify the change.':'Cold diagnostic. Answer from your own judgement; Beacon will not coach you yet.') +'</p></div>'+ 
+    (review?'<div class="ep-review-note"><strong>Review rule:</strong> no answer is marked yet. Your first answer has simply been restored for checking.</div>':'')+
+    '<div class="card"><div class="tag English">'+(review?'REVIEW':'FIRST PASS')+' · '+q.section.toUpperCase()+' · '+(a.index+1)+' OF '+EP_DIAGNOSTIC.length+'</div><div class="body">'+
+    '<div class="ep-progress">'+(review?'REVIEW PASS':'DIAGNOSTIC')+' · '+Math.round((a.index)/EP_DIAGNOSTIC.length*100)+'%</div><p class="q">'+esc(q.prompt)+'</p><div class="ep-context">'+epContextHtml(q)+'</div>'+epInputHtml(q,value)+
+    '<label>'+(review?'FIRST-PASS CONFIDENCE':'HOW CONFIDENT ARE YOU?')+'</label>'+epConfidenceHtml(review?r.confidence:a.confidence,review)+
+    (epError?'<div class="form-error">'+esc(epError)+'</div>':'')+
+    '<button class="big" id="ep-next">'+(review&&a.index===EP_DIAGNOSTIC.length-1?'Submit diagnostic':(a.index===EP_DIAGNOSTIC.length-1?'Begin neutral review':'Next'))+'</button></div></div>';
+  if(!review)v.querySelectorAll('[data-ep-confidence]').forEach(b=>b.onclick=()=>epSetConfidence(b.dataset.epConfidence));
+  document.getElementById("ep-next").onclick=epSaveDiagnosticStep;
+  setTimeout(()=>document.getElementById("ep-answer")?.focus(),0);
+}
+function renderEnglishProfile(v){
+  const s=epState.diagnostic.summary,weak=(epCurrentWeakTags()).slice(0,5),history=(epState.drillHistory||[]),last=history.slice(-3).reverse();
+  const reviewVersion=epState.profile?.reviewVersion,reviewed=["20b","20c","20d","20e"].includes(reviewVersion),reviewed20c=reviewVersion==="20c",reviewed20d=reviewVersion==="20d",reviewed20e=reviewVersion==="20e";
+  const recent=last.length?'<div class="card"><div class="body"><label>RECENT PRECISION SPRINTS</label>'+last.map(x=>'<div class="session-line"><span>'+new Date(x.completedAt).toLocaleDateString()+(x.review20e?' · 20e reviewed':(x.review20d?' · 20d reviewed':(x.review20c?' · 20c reviewed':'')))+'</span><strong>'+x.score+'/'+x.max+' raw</strong></div>').join('')+'</div></div>':'';
+  const sprintNote=history.length===0?'Sprint 01 is locked to D1’s reviewed baseline: 3 Cloze precision traps + 3 S&amp;T rule/execution checks.':(history.length===1&&history[0]?.review20c?'Sprint 02 is locked to the human-reviewed Sprint 01 profile: 3 light Cloze reinforcement items + 2 present-perfect/time transformations + 1 meaning-preservation S&amp;T check.':'Subsequent Precision Sprints adapt from recent human-reviewed misses.');
+  const status=reviewed20e?'20e Sprint 03 human review applied. Vocabulary Precision Tier 2 is unlocked.':(reviewed20d?'20d Sprint 02 human review applied. Vocabulary Precision is now live.':(reviewed20c?'20c Sprint 01 human review applied. Raw results preserved; adaptive truth corrected.':(reviewed?'20b field review applied. Raw baseline preserved; adaptive targets corrected.':'Beacon is now targeting the failure modes underneath the score.')));
+  const reviewNote=reviewed20e?'<div class="ep-review-note"><strong>20e Sprint 03 review:</strong> passive structure and tense were correct. The only miss changed “yesterday” to “the previous day”, importing a reported-speech shift into a passive-voice task. New execution rule: <strong>change only what the instruction asks; preserve everything else.</strong></div>':(reviewed20d?'<div class="ep-review-note"><strong>20d Sprint 02 review:</strong> the “although/until” Cloze item is retired as ambiguous; negative present-perfect structure is now acquired and the remaining time-rule target is FOR = duration vs SINCE = starting point. The blue-folder miss is tracked as payload preservation, not S&amp;T structure.</div>':(reviewed20c?'<div class="ep-review-note"><strong>20c Sprint 01 review:</strong> the defective “assurance” item is excluded; the doorway→window miss is classified as meaning-preservation execution, not a failure of the too…to structure. Present-perfect/time transformation is the confirmed persistent rule gap.</div>':(reviewed?'<div class="ep-review-note"><strong>20b reviewed baseline:</strong> ambiguous Cloze items and the confirmed typing slip are excluded from adaptive weighting. S&amp;T instruction compliance is tracked separately from rule knowledge.</div>':'')));
+  v.innerHTML='<div class="precision-hero"><h2>English Precision Profile</h2><p>'+status+'</p><div class="precision-rule">Instinct + proof.</div></div>'+
+    '<div class="precision-grid"><div class="metric"><strong>'+s.finalScore+'/'+s.maxScore+'</strong><span>Raw final diagnostic</span></div><div class="metric"><strong>'+s.avoidabilityRatio+'%</strong><span>Raw avoidability</span></div><div class="metric"><strong>'+s.catches+'</strong><span>Raw Beacon catches</span></div><div class="metric"><strong>'+s.highConfidenceMisses+'</strong><span>Raw high-confidence misses</span></div></div>'+
+    reviewNote+
+    '<div class="card"><div class="body"><label>BASELINE</label><div class="session-line"><span>First pass</span><strong>'+s.firstScore+'/'+s.maxScore+'</strong></div><div class="session-line"><span>After neutral review</span><strong>'+s.finalScore+'/'+s.maxScore+'</strong></div><div class="session-line"><span>Avoidable marks recovered</span><strong>'+s.avoidableMarksRecovered+'</strong></div><div class="session-line"><span>Right → wrong changes</span><strong>'+s.overthinks+'</strong></div></div></div>'+
+    '<div style="height:10px"></div><div class="card"><div class="body"><label>REVIEWED TRAINING TARGETS</label><ul class="weak-list">'+weak.map((t,i)=>'<li><strong>'+(i+1)+'. '+esc(reviewed?epReviewedTargetLabel(t):epTagLabel(t))+'</strong></li>').join('')+'</ul><button class="big" id="ep-drill">Start 6-question Precision Sprint</button><div class="tiny">'+sprintNote+'</div></div></div>'+
+    renderVocabularyLane()+
+    '<div style="height:10px"></div>'+recent;
+  document.getElementById("ep-drill").onclick=startPrecisionDrill;
+  document.getElementById("vocab-start").onclick=startVocabularySweep;
+}
+
+function epVerificationProtocol(q){
+  return q.section==="Cloze"?"Meaning → Grammar → Collocation → Whole passage":"Instruction → change only what is required → preserve payload → read once";
+}
+function renderPrecisionDrill(v){
+  const a=epState.active,q=epQuestionById(a.questionIds[a.index]),r=a.responses[q.id];
+  const feedback=a.feedback&&r;
+  v.innerHTML='<div class="precision-hero"><h2>Precision Sprint</h2><p>Six targeted questions. Verify before you commit.</p></div>'+ 
+    '<div class="card"><div class="tag English">TARGETED · '+q.section.toUpperCase()+' · '+(a.index+1)+' OF '+a.questionIds.length+'</div><div class="body"><div class="ep-review-note"><strong>BEACON CHECK:</strong> '+esc(epVerificationProtocol(q))+'</div><p class="q">'+esc(q.prompt)+'</p><div class="ep-context">'+epContextHtml(q)+'</div>'+ 
+    (feedback?'<div class="review-prefill"><label>YOUR ANSWER</label>'+esc(r.answer)+'</div>':epInputHtml(q,''))+
+    '<label>CONFIDENCE</label>'+epConfidenceHtml(feedback?r.confidence:a.confidence,feedback)+
+    (a.error?'<div class="form-error">'+esc(a.error)+'</div>':'')+
+    (feedback?(r.correct?'<div class="ep-good"><strong>Verified.</strong><div>'+esc(q.answer)+'</div><div class="tiny">'+esc(q.rule)+'</div></div>':'<div class="ep-miss"><strong>Beacon caught it.</strong><div>'+esc(q.answer)+'</div><div class="tiny">'+esc(q.rule)+'</div></div>'):'')+
+    '<button class="big" id="ep-drill-action">'+(feedback?(a.index===a.questionIds.length-1?'Finish sprint':'Next question'):'Check answer')+'</button></div></div>';
+  if(!feedback)v.querySelectorAll('[data-ep-confidence]').forEach(b=>b.onclick=()=>epSetConfidence(b.dataset.epConfidence));
+  document.getElementById("ep-drill-action").onclick=feedback?epNextDrill:epCheckDrill;
+  if(!feedback)setTimeout(()=>document.getElementById("ep-answer")?.focus(),0);
+}
+
+function readLocal(key){
+  try{return localStorage.getItem(key);}
+  catch(e){storageWarning="Beacon cannot read its saved data on this device.";return null;}
+}
+function writeLocal(key,value){
+  try{localStorage.setItem(key,value);return true;}
+  catch(e){storageWarning="Beacon could not save this change. Please tell Dad before closing the app.";return false;}
+}
+function removeLocal(key){try{localStorage.removeItem(key);return true;}catch(e){return false;}}
+function readNum(key){const v=Number(readLocal(key));return Number.isFinite(v)?v:0;}
+function standalone(){return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;}
+function examFor(subject){return EXAMS[subject]||Infinity;}
+function inFinalWindow(subject){const e=examFor(subject),t=today();return Number.isFinite(e)&&t>=e-FINAL_WINDOW_DAYS*DAY&&t<e;}
+function examActive(subject){return today()<examFor(subject);}
+function needsFinalSweep(c){const e=examFor(c.subject);return inFinalWindow(c.subject)&&c.finalSweep!==e;}
+function clone(v){return JSON.parse(JSON.stringify(v));}
+
+function normalizeCard(c){
+  const out={...c,
+    origin:c.origin || (String(c.id||"").startsWith("m-")||String(c.id||"").startsWith("s:") ? "mistake" : "seed"),
+    attempt:c.attempt||"",
+    note:c.note||"",
+    lastReviewed:c.lastReviewed||0,
+    finalSweep:c.finalSweep||0,
+    errors:Array.isArray(c.errors)?c.errors.map(e=>({...e,reviewedAt:Number(e.reviewedAt)||0,remember:e.remember||""})):[],
+    errorCount:Number.isFinite(c.errorCount)?c.errorCount:(Array.isArray(c.errors)?c.errors.length:0),
+    lastMissedAt:c.lastMissedAt||0,
+    source:c.source||"",
+    sourceStretchId:c.sourceStretchId||""
+  };
+  const meta=BUILTIN_META[out.id];
+  if(meta)Object.assign(out,meta);
+  return out;
+}
+function normalizeDeck(list){return list.map(normalizeCard);}
+function normalizeMeta(m){
+  if(!m||m.date!==today())return {date:today(),done:0,bonusDone:0,currentBonusId:null};
+  return {
+    date:today(),
+    done:Math.max(0,Math.min(PLAN.length,Number(m.done)||0)),
+    bonusDone:Math.max(0,Math.min(MAX_BONUS,Number(m.bonusDone)||0)),
+    currentBonusId:typeof m.currentBonusId==="string"?m.currentBonusId:null
+  };
+}
+function normalizeStretchState(s){
+  const out={};
+  if(s&&typeof s==="object"){
+    Object.keys(s).forEach(id=>{
+      const x=s[id]||{};
+      out[id]={lastSeen:Number(x.lastSeen)||0,lastServedAt:Number(x.lastServedAt)||0,
+               promoted:!!x.promoted,lastResult:x.lastResult||""};
+    });
+  }
+  return out;
+}
+function newState(cards,meta,stretchState){
+  return {version:"19e.1",cards:normalizeDeck(cards),meta:normalizeMeta(meta),stretchState:normalizeStretchState(stretchState)};
+}
+function reconcileStretchState(){
+  state.cards.forEach(c=>{
+    if(c.source==="stretch"&&c.sourceStretchId){
+      const x=state.stretchState[c.sourceStretchId]||{lastSeen:0,lastServedAt:0,promoted:false,lastResult:""};
+      x.promoted=true;state.stretchState[c.sourceStretchId]=x;
+    }
+  });
+  if(state.meta.currentBonusId){
+    const s=STRETCH.find(x=>x.id===state.meta.currentBonusId);
+    const x=state.stretchState[state.meta.currentBonusId];
+    if(!s||!examActive(s.subject)||(x&&x.promoted))state.meta.currentBonusId=null;
+  }
+}
+function persistState(markChange=true){
+  let ok=true;
+  try{localStorage.setItem(STATE_KEY,JSON.stringify(state));}
+  catch(e){storageWarning="Beacon could not save this change. Please tell Dad before closing the app.";return false;}
+
+  /* Legacy mirrors preserve a clean 19d rollback path. Root state remains 19e's source of truth. */
+  try{localStorage.setItem("beacon-deck",JSON.stringify(state.cards));}catch(e){ok=false;}
+  try{localStorage.setItem("beacon-meta",JSON.stringify({date:state.meta.date,done:state.meta.done}));}catch(e){ok=false;}
+  if(markChange){try{localStorage.setItem("beacon-last-change",String(Date.now()));}catch(e){ok=false;}}
+  if(!ok)storageWarning="Beacon saved the 19e state, but its rollback mirror could not be refreshed. Back up before closing the app.";
+  return true;
+}
+function transact(mutator,markChange=true){
+  const before=clone(state);
+  try{mutator(state);}
+  catch(e){state=before;storageWarning="Beacon could not complete that change safely.";return false;}
+  if(!persistState(markChange)){state=before;return false;}
+  return true;
+}
+function load(){
+  if(!readNum("beacon-created-at"))writeLocal("beacon-created-at",String(Date.now()));
+  /* 19e.1 removes external mistake capture; discard any unfinished 19e form draft. */
+  removeLocal("beacon-mistake-draft");
+  let loaded=false;
+  const raw=readLocal(STATE_KEY);
+  if(raw){
+    try{
+      const x=JSON.parse(raw);
+      if(x&&Array.isArray(x.cards)){
+        state=newState(x.cards,x.meta,x.stretchState);loaded=true;
+      }
+    }catch(e){storageWarning="Beacon found 19e state it could not read. It will try the 19d rollback mirror.";}
+  }
+  if(!loaded){
+    let cards=null,meta=null;
+    try{
+      const rawDeck=readLocal("beacon-deck");
+      if(rawDeck)cards=JSON.parse(rawDeck);
+      const rawMeta=readLocal("beacon-meta");
+      if(rawMeta)meta=JSON.parse(rawMeta);
+    }catch(e){storageWarning="Beacon found saved data it could not read. Please restore from a backup before continuing.";}
+    if(!Array.isArray(cards)||!cards.length){
+      cards=SEED.map((s,i)=>normalizeCard({id:"seed-"+i,subject:s[0],prompt:s[1],attempt:"",answer:s[2],note:s[3],
+        box:0,due:today(),seen:0,origin:"seed",lastReviewed:0,finalSweep:0}));
+    }
+    state=newState(cards,meta,{});
+  }
+  reconcileStretchState();
+  persistState(false);
+}
+
+function meta(){state.meta=normalizeMeta(state.meta);return state.meta;}
+function priorityMiss(c){return (c.origin==="mistake"&&c.box===0)||(c.box===0&&c.seen>0);}
+function rank(a,b){
+  const ma=priorityMiss(a)?0:1,mb=priorityMiss(b)?0:1;
+  if(ma!==mb)return ma-mb;
+  return a.due-b.due;
+}
+function finalRank(a,b){const ea=examFor(a.subject),eb=examFor(b.subject);return ea!==eb?ea-eb:rank(a,b);}
+function pool(){
+  const t=today();
+  return state.cards.filter(c=>examActive(c.subject)&&c.lastReviewed!==t&&(c.due<=t||needsFinalSweep(c)));
+}
+function remaining(){return Math.max(0,Math.min(PLAN.length-meta().done,pool().length));}
+function nextCard(){
+  const m=meta();
+  if(m.done>=PLAN.length)return null;
+  const p=pool();
+  if(!p.length)return null;
+
+  const mine=p.filter(priorityMiss).sort(rank);
+  if(m.done<ERROR_FIRST_SLOTS&&mine.length)return mine[0];
+
+  const finals=p.filter(needsFinalSweep).sort(finalRank);
+  if(finals.length)return finals[0];
+
+  const slot=PLAN[m.done];
+  const want=slot==="Language"?LANG:slot==="Any"?null:[slot];
+  let list=want?p.filter(c=>want.indexOf(c.subject)>-1):p.slice();
+  if(!list.length)list=p.slice();
+  return list.sort(rank)[0];
+}
+function applyReviewState(c,got){
+  const box=got?Math.min((Number(c.box)||0)+1,INTERVALS.length-1):0;
+  c.box=box;c.seen=(Number(c.seen)||0)+1;c.lastReviewed=today();
+  const exam=examFor(c.subject);
+  if(inFinalWindow(c.subject)){
+    c.finalSweep=exam;
+    c.due=got?exam:Math.min(today()+DAY,exam-DAY);
+  }else{
+    let due=today()+INTERVALS[box]*DAY;
+    if(Number.isFinite(exam))due=Math.min(due,exam-FINAL_WINDOW_DAYS*DAY);
+    c.due=Math.max(today()+DAY,due);
+  }
+}
+function initialWeaknessDue(subject){
+  const exam=examFor(subject);
+  if(inFinalWindow(subject))return Math.min(today()+DAY,exam-DAY);
+  let due=today()+DAY;
+  if(Number.isFinite(exam))due=Math.min(due,exam-FINAL_WINDOW_DAYS*DAY);
+  return Math.max(today()+DAY,due);
+}
+function appendError(c,source){
+  const err={at:Date.now(),type:null,note:"",source:source||"core"};
+  c.errors=Array.isArray(c.errors)?c.errors:[];
+  c.errors.push(err);
+  c.errorCount=(Number(c.errorCount)||0)+1;
+  c.lastMissedAt=err.at;
+  return err;
+}
+
+function stretchEntry(id){
+  if(!state.stretchState[id])state.stretchState[id]={lastSeen:0,lastServedAt:0,promoted:false,lastResult:""};
+  return state.stretchState[id];
+}
+function eligibleStretch(){
+  const t=today();
+  return STRETCH.filter(s=>{
+    const x=state.stretchState[s.id];
+    return examActive(s.subject)&&!(x&&x.promoted)&&!(x&&x.lastSeen===t);
+  });
+}
+function hasEligibleStretch(){return eligibleStretch().length>0;}
+function chooseStretch(){
+  const m=meta(),list=eligibleStretch();
+  if(!list.length)return null;
+  const slot=BONUS_PLAN[Math.min(m.bonusDone,BONUS_PLAN.length-1)];
+  const want=slot==="Language"?LANG:[slot];
+  let candidates=list.filter(s=>want.indexOf(s.subject)>-1);
+  if(!candidates.length)candidates=list;
+  candidates.sort((a,b)=>{
+    const aa=state.stretchState[a.id]?.lastServedAt||0;
+    const bb=state.stretchState[b.id]?.lastServedAt||0;
+    return aa-bb || a.id.localeCompare(b.id);
+  });
+  return candidates[0];
+}
+function currentBonus(){
+  const id=meta().currentBonusId;
+  return id?STRETCH.find(s=>s.id===id)||null:null;
+}
+function serveBonus(){
+  if(busy)return;
+  const m=meta();
+  if(m.done<PLAN.length||m.bonusDone>=MAX_BONUS||m.currentBonusId)return;
+  const s=chooseStretch();
+  if(!s)return;
+  busy=true;
+  const ok=transact(st=>{
+    const mm=st.meta;
+    mm.bonusDone++;
+    mm.currentBonusId=s.id;
+    const x=st.stretchState[s.id]||{lastSeen:0,lastServedAt:0,promoted:false,lastResult:""};
+    x.lastSeen=today();x.lastServedAt=Date.now();st.stretchState[s.id]=x;
+  });
+  busy=false;shown=false;if(ok)render();else renderNotices();
+}
+function promotionId(stretchId){return "s:"+stretchId;}
+function createPromotedCard(s){
+  const exam=examFor(s.subject),errAt=Date.now();
+  return normalizeCard({
+    id:promotionId(s.id),subject:s.subject,prompt:s.prompt,answer:s.answer,note:s.note||"",
+    promptPinyin:s.promptPinyin||"",answerPinyin:s.answerPinyin||"",answerGloss:s.answerGloss||"",
+    attempt:"",box:0,due:initialWeaknessDue(s.subject),seen:1,origin:"mistake",
+    source:"stretch",sourceStretchId:s.id,lastReviewed:today(),
+    finalSweep:inFinalWindow(s.subject)?exam:0,
+    errors:[{at:errAt,type:null,note:"",source:"stretch"}],errorCount:1,lastMissedAt:errAt
+  });
+}
+
+function backupDue(){
+  const change=readNum("beacon-last-change"),backup=readNum("beacon-last-backup");
+  if(!change||change<=backup)return false;
+  const baseline=backup||readNum("beacon-created-at")||change;
+  return Date.now()-baseline>=BACKUP_AFTER_DAYS*DAY;
+}
+function renderNotices(){
+  const n=document.getElementById("notices"),parts=[];
+  if(storageWarning)parts.push('<div class="notice warn"><strong>Save warning.</strong> '+esc(storageWarning)+'</div>');
+  if(epError)parts.push('<div class="notice warn"><strong>English Precision.</strong> '+esc(epError)+'</div>');
+  if(!standalone()&&readLocal("beacon-setup-seen")!=="1"){
+    parts.push('<div class="notice"><button id="dismiss-setup">Got it</button><strong>One Beacon, one device.</strong> Use D1’s main study device as the source of truth. On iPhone/iPad: Share → Add to Home Screen.</div>');
+  }
+  if(backupDue())parts.push('<div class="notice warn"><button id="backup-now">Back up now</button><strong>Backup check.</strong> Your Beacon has changed since the last backup.</div>');
+  n.innerHTML=parts.join("");
+  const ds=document.getElementById("dismiss-setup");if(ds)ds.onclick=()=>{writeLocal("beacon-setup-seen","1");renderNotices();};
+  const bn=document.getElementById("backup-now");if(bn)bn.onclick=doExport;
+}
+function render(){
+  renderNotices();
+  const v=document.getElementById("view");
+  document.getElementById("t-today").textContent="Today ("+remaining()+")";
+  document.getElementById("t-add").textContent="Review mistakes ("+pendingMistakes().length+")";
+  document.getElementById("t-all").textContent="All cards ("+state.cards.length+")";
+  ["today","add","all"].forEach(t=>document.getElementById("t-"+t).classList.toggle("on",tab===t));
+  document.getElementById("t-english").classList.toggle("on",tab==="english");
+  if(tab==="english")return renderEnglish(v);
+  if(tab==="today")return renderToday(v);
+  if(tab==="add")return renderReviewMistakes(v);
+  renderAll(v);
+}
+function promptExtras(c){
+  return (c.promptPinyin?'<div class="pinyin">'+esc(c.promptPinyin)+'</div>':'');
+}
+function answerExtras(c){
+  return (c.answerPinyin?'<div class="pinyin" style="margin:2px 0 8px">'+esc(c.answerPinyin)+'</div>':'')+
+         (c.answerGloss?'<div class="gloss">'+esc(c.answerGloss)+'</div>':'');
+}
+function coachingFor(c){
+  if(c.subject==="Science")return "Say the full answer out loud first. Aim for cause → process → effect.";
+  if(c.subject==="Maths")return "Work it through before revealing. Ask: what changed, and what stayed the same?";
+  if(c.subject==="Chinese")return "Read the Chinese first. Use the Hanyu Pinyin underneath only when you need support.";
+  return "Say your full answer out loud before you reveal it.";
+}
+
+function renderToday(v){
+  if(pendingClassify)return renderClassification(v);
+
+  const m=meta();
+  if(m.done>=PLAN.length){
+    const b=currentBonus();
+    if(b)return renderBonusCard(v,b);
+    return renderCompletion(v);
+  }
+
+  const c=nextCard();
+  if(!c){
+    v.innerHTML='<div class="empty"><strong>Nothing due today.</strong><span>Your next review will appear when it is useful.</span></div>';
+    return;
+  }
+  v.innerHTML='<div class="card"><div class="tag '+c.subject+'">'+c.subject.toUpperCase()+' · CARD '+(m.done+1)+' OF '+PLAN.length+'</div><div class="body">'+
+    '<p class="q">'+esc(c.prompt)+'</p>'+promptExtras(c)+
+    (!shown
+      ? '<p class="commit">'+esc(coachingFor(c))+'</p><button class="big" id="reveal">I’ve answered · Show answer</button>'
+      : '<div class="a"><p>'+esc(c.answer)+'</p>'+answerExtras(c)+(c.note?'<p class="why">'+esc(c.note)+'</p>':'')+'</div>'+
+        '<div class="row"><button class="miss" id="no">Missed it</button><button class="good" id="yes">Got it</button></div>')+
+    '</div></div>';
+  if(!shown)document.getElementById("reveal").onclick=()=>{shown=true;render();};
+  else{
+    document.getElementById("no").onclick=()=>gradeCore(c,false);
+    document.getElementById("yes").onclick=()=>gradeCore(c,true);
+  }
+}
+function gradeCore(c,got){
+  if(busy)return;busy=true;
+  let errAt=null;
+  const ok=transact(st=>{
+    const card=st.cards.find(x=>x.id===c.id);
+    if(!card)throw new Error("missing card");
+    applyReviewState(card,got);
+    if(!got)errAt=appendError(card,"core").at;
+    st.meta.done=Math.min(PLAN.length,(Number(st.meta.done)||0)+1);
+  });
+  busy=false;shown=false;
+  if(ok&&got){render();return;}
+  if(ok&&!got){pendingClassify={cardId:c.id,errorAt:errAt};render();return;}
+  render();
+}
+function renderClassification(v){
+  const card=state.cards.find(c=>c.id===pendingClassify.cardId);
+  if(!card){pendingClassify=null;return renderToday(v);}
+  v.innerHTML='<div class="caught"><strong>Beacon caught it.</strong>You won’t need to enter this question again. It is saved in Review mistakes and will come back at the next useful review.</div>'+
+    '<div class="card"><div class="body"><p class="step-title">What tripped you up?</p>'+
+    '<p style="font-size:13px;color:var(--slate);margin:-6px 0 10px">Optional: add a short note first, then tap one reason. Or skip.</p>'+
+    '<input id="err-note" placeholder="Optional note">'+
+    '<div class="choice-grid">'+ERROR_TYPES.map(t=>'<button data-error="'+esc(t)+'">'+esc(t)+'</button>').join("")+'</div>'+
+    '<button class="quiet" id="skip-error">Skip · the miss is already saved</button></div></div>';
+  v.querySelectorAll("[data-error]").forEach(b=>b.onclick=()=>saveClassification(b.dataset.error));
+  document.getElementById("skip-error").onclick=()=>{pendingClassify=null;render();};
+}
+function saveClassification(type){
+  if(busy)return;busy=true;
+  const note=(document.getElementById("err-note")?.value||"").trim();
+  const p={...pendingClassify};
+  const ok=transact(st=>{
+    const c=st.cards.find(x=>x.id===p.cardId);
+    if(!c)return;
+    const err=(c.errors||[]).find(e=>e.at===p.errorAt);
+    if(err){err.type=type;err.note=note;}
+    c.lastErrorType=type;c.lastErrorNote=note;
+  });
+  busy=false;
+  if(ok){pendingClassify=null;render();}else render();
+}
+
+function renderCompletion(v){
+  const m=meta(),eligible=m.bonusDone<MAX_BONUS&&hasEligibleStretch();
+  let extra='';
+  if(eligible){
+    extra='<div class="bonusbox"><strong>Bonus Round?</strong><span>You’re already done. This is just for a harder challenge.</span>'+
+      '<button class="big" id="bonus">Give me a challenge</button><div class="tiny">'+m.bonusDone+' of '+MAX_BONUS+' bonus cards used today</div></div>';
+  }else if(m.bonusDone>0){
+    extra='<div class="bonusbox"><strong>Bonus round complete.</strong><span>'+m.bonusDone+' challenge'+(m.bonusDone===1?'':'s')+' done today.</span></div>';
+  }
+  v.innerHTML='<div class="empty"><strong>All five done for today.</strong><span>You’re finished. Nice work.</span></div>'+extra;
+  const b=document.getElementById("bonus");if(b)b.onclick=serveBonus;
+}
+function renderBonusCard(v,s){
+  const m=meta();
+  v.innerHTML='<div class="card"><div class="tag stretch">BONUS '+m.bonusDone+' OF '+MAX_BONUS+' · '+s.subject.toUpperCase()+' STRETCH</div><div class="body">'+
+    '<p class="q">'+esc(s.prompt)+'</p>'+promptExtras(s)+
+    (!shown
+      ? '<p class="commit">'+esc(coachingFor(s))+'</p><button class="big" id="reveal-bonus">I’ve answered · Show answer</button>'
+      : '<div class="a"><p>'+esc(s.answer)+'</p>'+answerExtras(s)+(s.note?'<p class="why">'+esc(s.note)+'</p>':'')+'</div>'+
+        '<div class="row"><button class="miss" id="bonus-no">Missed it</button><button class="good" id="bonus-yes">Got it</button></div>')+
+    '</div></div>';
+  if(!shown)document.getElementById("reveal-bonus").onclick=()=>{shown=true;render();};
+  else{
+    document.getElementById("bonus-yes").onclick=()=>gradeBonus(s,true);
+    document.getElementById("bonus-no").onclick=()=>gradeBonus(s,false);
+  }
+}
+function gradeBonus(s,got){
+  if(busy)return;busy=true;
+  let promotedCardId=null,errAt=null;
+  const ok=transact(st=>{
+    if(st.meta.currentBonusId!==s.id)throw new Error("bonus changed");
+    const x=st.stretchState[s.id]||{lastSeen:today(),lastServedAt:Date.now(),promoted:false,lastResult:""};
+    x.lastResult=got?"got":"missed";
+    if(got){
+      st.stretchState[s.id]=x;
+      st.meta.currentBonusId=null;
+      return;
+    }
+
+    const pid=promotionId(s.id);
+    let c=st.cards.find(card=>card.id===pid||card.sourceStretchId===s.id);
+    if(!c){
+      c=createPromotedCard(s);
+      st.cards.push(c);
+      errAt=c.errors[0].at;
+    }else{
+      promotedCardId=c.id;
+      if(!x.promoted){
+        applyReviewState(c,false);
+        errAt=appendError(c,"stretch").at;
+      }
+    }
+    x.promoted=true;st.stretchState[s.id]=x;
+    st.meta.currentBonusId=null;
+    promotedCardId=c.id;
+  });
+  busy=false;shown=false;
+  if(!ok){render();return;}
+  if(got){render();return;}
+  if(promotedCardId&&errAt){pendingClassify={cardId:promotedCardId,errorAt:errAt};}
+  render();
+}
+
+/* 19e.1 Mistake Review: every missed Beacon card becomes a prefilled review exercise. */
+function pendingMistakes(){
+  const out=[];
+  state.cards.forEach(card=>{
+    (card.errors||[]).forEach(err=>{
+      if(!err.reviewedAt)out.push({card,err});
+    });
+  });
+  return out.sort((a,b)=>(a.err.at||0)-(b.err.at||0));
+}
+function reviewReason(item,type){
+  if(busy)return;busy=true;
+  const ok=transact(st=>{
+    const c=st.cards.find(x=>x.id===item.card.id);if(!c)throw new Error("missing review card");
+    const e=(c.errors||[]).find(x=>x.at===item.err.at);if(!e)throw new Error("missing review error");
+    e.type=type;c.lastErrorType=type;
+  });
+  busy=false;if(ok)render();else renderNotices();
+}
+function completeMistakeReview(item){
+  if(busy)return;
+  const remember=(document.getElementById("review-remember")?.value||"").trim();
+  if(!item.err.type){
+    storageWarning="Choose what went wrong before completing this review.";render();return;
+  }
+  busy=true;
+  const ok=transact(st=>{
+    const c=st.cards.find(x=>x.id===item.card.id);if(!c)throw new Error("missing review card");
+    const e=(c.errors||[]).find(x=>x.at===item.err.at);if(!e)throw new Error("missing review error");
+    e.reviewedAt=Date.now();e.remember=remember;
+  });
+  busy=false;
+  if(ok){storageWarning="";reviewSuccess="You’re all set to ace this the next time it pops up.";render();}
+  else renderNotices();
+}
+function renderReviewMistakes(v){
+  const pending=pendingMistakes();
+  if(reviewSuccess){
+    const hasMore=pending.length>0;
+    v.innerHTML='<div class="caught" style="padding:22px"><strong>'+esc(reviewSuccess)+'</strong>'+
+      '<div style="margin-top:12px"><button class="big" id="review-next">'+(hasMore?'Review next mistake':'Back to Today')+'</button></div></div>';
+    document.getElementById("review-next").onclick=()=>{reviewSuccess="";if(!hasMore)tab="today";render();};
+    return;
+  }
+  if(!pending.length){
+    v.innerHTML='<div class="empty"><strong>No mistakes waiting.</strong><span>When you miss a Beacon card, the question, what went wrong and the model answer will be saved here automatically.</span></div>';
+    return;
+  }
+  const item=pending[0],c=item.card,e=item.err;
+  const remember=e.remember||c.note||"";
+  const reason=e.type
+    ? '<div class="choice-grid"><button class="on" style="grid-column:1/-1">'+esc(e.type)+'</button></div>'
+    : '<div class="choice-grid">'+ERROR_TYPES.map(t=>'<button data-review-error="'+esc(t)+'">'+esc(t)+'</button>').join("")+'</div>';
+  v.innerHTML='<div class="card"><div class="tag '+c.subject+'">MISTAKE REVIEW · '+c.subject.toUpperCase()+' · 1 OF '+pending.length+'</div><div class="body">'+
+    '<label>THE QUESTION</label><p class="q">'+esc(c.prompt)+'</p>'+promptExtras(c)+
+    '<label>WHAT WENT WRONG?</label>'+reason+
+    (e.note?'<div class="commit"><strong>Your note:</strong> '+esc(e.note)+'</div>':'')+
+    '<label>WHAT THE ANSWER SHOULD BE</label><div class="a"><p>'+esc(c.answer)+'</p>'+answerExtras(c)+'</div>'+
+    '<label>WHAT SHOULD I REMEMBER NEXT TIME?</label><textarea id="review-remember" rows="3" placeholder="One short thing to remember">'+esc(remember)+'</textarea>'+
+    '<button class="big" id="complete-review">I’ve reviewed this</button>'+
+    '<div class="tiny">Beacon will bring this question back at the next useful review.</div>'+
+    '</div></div>';
+  v.querySelectorAll("[data-review-error]").forEach(b=>b.onclick=()=>reviewReason(item,b.dataset.reviewError));
+  document.getElementById("complete-review").onclick=()=>completeMistakeReview(item);
+}
+
+function cardStatus(c){
+  const exam=examFor(c.subject);
+  if(today()>=exam)return "Paper completed";
+  if(needsFinalSweep(c))return "Final review due";
+  return "Box "+((Number(c.box)||0)+1)+" · next on "+new Date(c.due).toLocaleDateString();
+}
+function renderAll(v){
+  v.innerHTML=state.cards.map(c=>'<div class="item"><span class="pill '+c.subject+'">'+c.subject.slice(0,4).toUpperCase()+'</span><div class="txt">'+
+    esc(c.prompt.slice(0,90))+(c.prompt.length>90?'…':'')+'<div class="meta">'+esc(cardStatus(c))+
+    (c.origin==="mistake"?' · MY MISTAKE':'')+(c.source==="stretch"?' · FROM STRETCH':'')+
+    (c.lastErrorType?' · '+esc(c.lastErrorType):'')+'</div>'+
+    '</div></div>').join("");
+}
+
+function doExport(){
+  const payload={
+    product:"The Beacon",version:"20e",exportedAt:new Date().toISOString(),
+    cards:state.cards,meta:state.meta,stretchState:state.stretchState,englishPrecision:epState
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a"),url=URL.createObjectURL(blob);
+  a.href=url;a.download="the-beacon-backup-20e.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  writeLocal("beacon-last-backup",String(Date.now()));renderNotices();
+}
+function restorePayload(data){
+  if(Array.isArray(data)){
+    if(!data.length||!data.every(c=>c&&c.prompt&&c.subject&&c.answer))throw new Error("bad legacy");
+    return {core:newState(data,null,{}),english:null};
+  }
+  if(data&&Array.isArray(data.cards)&&data.cards.length&&data.cards.every(c=>c&&c.prompt&&c.subject&&c.answer)){
+    return {core:newState(data.cards,data.meta,data.stretchState||{}),english:data.englishPrecision?normalizeEnglishState(data.englishPrecision):null};
+  }
+  throw new Error("bad backup");
+}
+
+document.getElementById("t-today").onclick=()=>{tab="today";shown=false;pendingClassify=null;reviewSuccess="";render();};
+document.getElementById("t-add").onclick=()=>{tab="add";shown=false;pendingClassify=null;reviewSuccess="";render();};
+document.getElementById("t-all").onclick=()=>{tab="all";shown=false;pendingClassify=null;reviewSuccess="";render();};
+document.getElementById("t-english").onclick=()=>{tab="english";shown=false;pendingClassify=null;reviewSuccess="";epError="";render();};
+document.getElementById("export").onclick=doExport;
+document.getElementById("restore").onclick=()=>document.getElementById("file").click();
+document.getElementById("file").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result),next=restorePayload(data);
+      if(!confirm("Replace the current Beacon with "+next.core.cards.length+" cards from this backup?"))return;
+      const before=clone(state),beforeEnglish=clone(epState);state=next.core;reconcileStretchState();
+      if(next.english)epState=next.english;
+      if(!persistState(true)||!persistEnglishPrecision(false)){state=before;epState=beforeEnglish;throw new Error("save failed");}
+      writeLocal("beacon-last-backup",String(Date.now()));tab="today";shown=false;pendingClassify=null;reviewSuccess="";render();
+      alert("Restored "+state.cards.length+" cards"+(next.english?" plus English Precision data":". Your existing English Precision data was preserved")+".");
+    }catch(err){alert("That file does not look like a Beacon backup.");}
+  };
+  r.readAsText(f);e.target.value="";
+};
+
+load();loadEnglishPrecision();render();
+</script>
+</body>
+</html>
